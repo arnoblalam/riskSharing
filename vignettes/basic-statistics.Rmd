@@ -1,0 +1,102 @@
+---
+title: "Basic Descriptive Statistics"
+author: "Arnob L. Alam"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Purpose
+
+This vigentte shows some basic descriptive statstics about the networks fomred
+by the Nyakatoke Village survey.
+
+# Survey and data organization
+
+The survey data comes from (Fafchamps and Comola, 2013) [1].  They provide the
+following description of the data
+
+> The Tanzanian data set comes from a village community named Nyakatoke in the 
+Buboka Rural District of Tanzania, at the west of Lake Victoria. The data set is 
+a census covering all 119 households in the village and includes information on 
+households' demographics, wealth and assets, income sources and income shocks, 
+transfers and interpersonal relations...
+
+> During the first survey round, each adult in the village was asked: 
+‘Can you give a list of people from inside or outside of Nyakatoke, who you can 
+personally rely on for help and/or that can rely on you for help in cash, kind 
+or labour?’Aggregated at the level of each household, the responses to this 
+question constitute variables $g_{ij}^{i}$ and $g_{ji}^j$. In other words,
+$g_{ij}^{i} = 1$ if an adult member of household $i$ mentions an adult member 
+of household $j$ in their response to the above question.
+
+In the data, the households are given a number from 1 through 119.  The columns 
+`hh1` and `hh2` are the IDs of two households. `willingness_link1` takes on a 
+value of $1$ if at least one adult member from the household identified by `hh1` 
+mentioned someone from the household identified by `hh2` in their answer to the 
+question "Can you give a list of people from inside or outside of Nyakatoke, 
+who you can  personally rely on for help and/or that  can rely on you for help 
+in cash, kind or labour"?  Similarly, `willingness_link2` takes on a value of 1 
+if a member of household 2 listed someone from household 1 to the same question.
+
+```{r short description of data}
+library(riskSharing)
+data("nyakatoke")
+knitr::kable(head(nyakatoke[,1:4]))
+```
+
+Here we see (from row 1) that household 113 and household 1 have no link betwwen 
+them. From row 2, we see Household 76 and Household 1 might have a link because 
+someone from household 1 mentioned household 76 in the answer to the survey.
+However, no one from household 76 mentioned anyone from household 1 in their
+answer.  Finally, from row 3 we see there is a link between household 17 and
+household 1 (both `willingness_link1` and `willingness_link2` are 1).
+
+Note that in our dataset, each pair of household shows up twice, once in the `hh1`
+column and again in the `hh2` column.  For example, household 1 and household 76
+show up as:
+
+```{r households pairs appear twice}
+knitr::kable(subset(nyakatoke[,1:4], (hh1 == 1 & hh2 == 76) | (hh1 == 76 & hh2 == 1)))
+```
+
+Here we see the combination (household 76, household 1) show up in row 2 of the data
+and the combination (household 76, household 1) show up in row 8937 of the data.
+Looking at the `willingness_link1` and `willingness_link2` columns, we see that the
+data in these rows are just flipped versions of each other.
+
+# Several networks from underlying data
+
+Using the data from the survey, we can create several networks.  We create the
+following three networks (more details about what each network represents is
+provided in our paper).
+
+1. A _directed network_.  If (an adult member of) household 1 lists (somenoe from)
+    household 2 as an answer to the relevant survey question, we say there is a 
+    directed link FROM household 1 TO household 2. This corrsponds to the desire 
+    to link model in our paper.
+
+2. An _undirected network assuming links are underreported_.  In this case, if an
+    (adult member) from household 1 mentions someone from household 2 as an 
+    answer to the relevant survey question, we say there is an undirected link
+    between the two households.  This corresponds to the underreporting model
+    in our paper.
+
+3. An _undirected network assuming links are overreported_. In this case, if 
+    members from both households list someone from the other household as an
+    answer to the relevant survey question, we say there is an undirected link
+    between the two households.  This corresponds to the overreporting model
+    in our paper.
+    
+```{r create networks}
+# For the desire to link data, we create an "edgelist" that igraph can read.
+# This is a list of households where the first household in the pair mentioned
+# someone from household 2 in their survey response.
+edgelist <- as.matrix(nyakatoke[nyakatoke$willingness_link1 == 1, 1:2])
+g.directed <- igraph::graph_from_data_frame(edgelist)
+
+# For the underreporting model, we create a graph from the dataframe
+```
