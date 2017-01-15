@@ -40,7 +40,7 @@ mentioned someone from the household identified by `hh2` in their answer to the
 question "Can you give a list of people from inside or outside of Nyakatoke, 
 who you can  personally rely on for help and/or that  can rely on you for help 
 in cash, kind or labour"?  Similarly, `willingness_link2` takes on a value of 1 
-if a member of household 2 listed someone from household 1 to the same question.
+if a member of `hh2` listed someone from `hh1` to the same question.
 
 ```{r short description of data}
 library(riskSharing)
@@ -48,12 +48,18 @@ data("nyakatoke")
 knitr::kable(head(nyakatoke[,1:4]))
 ```
 
+Table: The first few rows and four columns of data from the Nyakatoke village
+    survey
+    
 Here we see (from row 1) that household 113 and household 1 have no link betwwen 
 them. From row 2, we see Household 76 and Household 1 might have a link because 
 someone from household 1 mentioned household 76 in the answer to the survey.
 However, no one from household 76 mentioned anyone from household 1 in their
 answer.  Finally, from row 3 we see there is a link between household 17 and
 household 1 (both `willingness_link1` and `willingness_link2` are 1).
+    
+The definitions of these columns will be expanded upon when we use them in
+later analysis.
 
 Note that in our dataset, each pair of household shows up twice, once in the `hh1`
 column and again in the `hh2` column.  For example, household 1 and household 76
@@ -67,6 +73,15 @@ Here we see the combination (household 76, household 1) show up in row 2 of the 
 and the combination (household 76, household 1) show up in row 8937 of the data.
 Looking at the `willingness_link1` and `willingness_link2` columns, we see that the
 data in these rows are just flipped versions of each other.
+
+The data also lists other characteristics of the housholds.  Here we show a few
+rows and all columns of the dataset.
+
+```{r head all columns}
+knitr::kable(head(nyakatoke))
+```
+
+Table: All columns from in the data.
 
 # Several networks from underlying data
 
@@ -99,4 +114,41 @@ edgelist <- as.matrix(nyakatoke[nyakatoke$willingness_link1 == 1, 1:2])
 g.directed <- igraph::graph_from_data_frame(edgelist)
 
 # For the underreporting model, we create a graph from the dataframe
+# First we keep only the rows where at least one houshold said the other is in
+# their network.
+underreporting.df <- 
+    nyakatoke[nyakatoke$willingness_link1 == 1 | nyakatoke$willingness_link2 == 1,]
+# We then convert this into an undirected graph
+g.underreporting <- igraph::graph_from_data_frame(underreporting.df, 
+                                                  directed = FALSE)
+# We then remove any multiple edges
+g.underreporting <- igraph::simplify(g.underreporting)
+
+# For the overreporting model we only keep those rows where both households
+# listed the other in their network
+overreporting.df <- 
+    nyakatoke[nyakatoke$willingness_link1 == 1 & nyakatoke$willingness_link2 == 1,]
+# We then create an graph
+g.overreporting <- igraph::graph_from_data_frame(overreporting.df, directed = FALSE)
+# From examining the list of vertices, we note that households 7, 30 32, 36, 44,
+# 65, 84, 88, 91, 96, 107, 110, 116, 117, 118 and 119 don't show up in the 
+# graph. This is because there is no case where these households list another 
+# household in their support network and they do the same.  We dd back these 
+# vertices as isolated vertices
+missing.vertices <- c(7, 30, 32, 46, 44, 65, 84, 88, 91, 96, 107, 110, 
+                      116, 117, 118, 119)
+g.overreporting <- (Reduce(f = function(x, y) {y + igraph::vertex(x)},
+       x = missing.vertices,
+       init = g.overreporting,
+       right = TRUE))
+# We remove multiple edges
+g.overreporting <- igraph::simplify(g.overreporting)
 ```
+
+Now that we have created the graphs, we report some basic descriptive statistics
+for each graph:
+
+1. The number of vertices
+2. The number of edges
+3. The average degree (or average in-degree and out-degree for a directed graph)
+4. The average path length
