@@ -1,10 +1,15 @@
 Package: riskSharing
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Analysis of a risk sharing network in Nyakatoke, Tanzania
 Version: 0.1.0
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Authors@R: person("Arnob", "Alam", email = "aa2288@student.american.edu", role = c("aut", "cre"))
+Description: An analysis of risk sharing networks in a village in Tanzania.  
+                Participants were asked ‘Can you give a list of people from 
+                inside or outside of Nyakatoke, who you can personally rely on 
+                for help and/or that can rely on you for help in cash, kind 
+                or labour?’  We turn their answers into networks between 
+                households and report on some basic structure of the network.
+License: GPLv3
 LazyData: TRUE
 Suggests: knitr,
     rmarkdown
