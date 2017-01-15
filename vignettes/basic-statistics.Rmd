@@ -152,3 +152,22 @@ for each graph:
 2. The number of edges
 3. The average degree (or average in-degree and out-degree for a directed graph)
 4. The average path length
+
+## Directed Graph
+
+```{r descriptive stats directed}
+descriptive_stats(g.directed)
+```
+
+## Undirected graph
+
+### Underreporting model
+
+```{r descriptive stats under}
+descriptive_stats(g.underreporting)
+```
+
+### Overreporting Model
+```{r descriprive stats over}
+descriptive_stats(g.overreporting)
+```
