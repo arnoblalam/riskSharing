@@ -11,6 +11,7 @@ Description: An analysis of risk sharing networks in a village in Tanzania.
                 households and report on some basic structure of the network.
 License: GPLv3
 LazyData: TRUE
+Depends: igraph
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
