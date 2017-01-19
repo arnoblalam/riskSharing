@@ -32,5 +32,6 @@ descriptive_stats <- function(g) {
     } else {
         cat(paste("Average degree:\t\t", x[["degree"]], "\n"))
     }
+    cat(paste("Clustering Coefficient: \t", round(igraph::transitivity(g), 2)))
 
 }
