@@ -1,0 +1,178 @@
+---
+title: "Percolation on Risk Sharing network"
+author: "Arnob Alam"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+This vignette simulates site percolation in our risk sharing network.  _Site
+percolation_ refers to the random removal of nodes on the network.  In our
+network this could be due to migration, death, or agents simply opting out of
+their obligations (default).  We are interested in whether the network is
+connected (that is, a giant component exists) after a fraction $\phi_c$ of the
+nodes are randomly removed.
+
+# Algorithm
+
+We use the following algorithms to simulate percolation (our graph has 119
+vertices):
+
+1. Start with n = 1, m = 1, i = 0, sim_size = 1000
+2. Randomly remove n out of 119 vertices from the graph
+3. Calculate the size of the relative size of the largest connected component
+(number of nodes in largest component/119)
+4. Store the results of step 4 in i
+5. Increase m by 1
+6. If m < sim_size, go back to step 2
+7. Calculate $S$ the average size of giant component as $S = \frac{i}{sim\_size}$
+8. Increse n by 1
+9. If n < 118, return to step 2
+
+# Results
+
+We implment the algorithm below. First we load the data and create the graph
+
+```{r load-data}
+# Load package
+library(igraph)
+library(riskSharing)
+
+#Get data
+data("nyakatoke")
+
+# Create the underreporting graph
+
+# For the underreporting model, we create a graph from the dataframe
+# First we keep only the rows where at least one houshold said the other is in
+# their network.
+underreporting.df <- 
+    nyakatoke[nyakatoke$willingness_link1 == 1 | nyakatoke$willingness_link2 == 1,]
+# We then convert this into an undirected graph
+g.underreporting <- igraph::graph_from_data_frame(underreporting.df, 
+                                                  directed = FALSE)
+# We then remove any multiple edges
+g.underreporting <- igraph::simplify(g.underreporting)
+```
+
+We then implement the algorithm descrbed
+
+```{r percolation}
+S <- numeric(120) # vector to hold our results
+sim_size <- 1000 # Number of simulations
+i <- numeric(sim_size) # Vector to hold cluster sizes
+for (n in 0:119) {
+    # n is the number of nodes to remove
+    for (m in 1:sim_size) {
+        # m is the mth simulation
+        to_remove <- sample(1:119, n)
+        # randomly pick n of the 119 nodes to remove
+        i[m] <- components(
+            delete_vertices(g.underreporting, to_remove))$csize[1]/119
+        # calculate the size of the giant component and save the result to
+        # the variable i
+    }
+    S[n+1] <- mean(i)
+    # the average cluster size (after removing n nodes) is the average of the 
+    # i variable
+}
+```
+
+Let's put the results in a nice table/graph
+
+```{r plot results, fig.width=12, fig.height=8}
+my_df <- data.frame(phi = 1-(0:119)/119, S = S)
+# rbind(my_df, c(phi = 0, S = 1), c(phi = 1, S = 0))
+main = expression(paste("Occupaion Probability, ", phi, ", vs. size of giant cluster ", S))
+plot(my_df[1:117,], 
+     type = "l", 
+     main = main,
+     xlab = expression(phi))
+```
+
+# Discussion
+
+The graph displays the occupation probability $\phi$ (fraction of vertices
+remaining in the graph) vs. the percolation strength $S$ (the average size of
+the giant component).  If we start off at the right hand of the graph, we get 
+the original (connected) graph.  As we move towards the left, more and more vertices
+are removed.  We see that by the time we have removed about half the nodes, the
+percolation probability is around 48%, and after removing about 2/3 of the nodes,
+the percolation probability is 29%.
+
+Note that for Poisson random graphs, we would expect to see a critical $\phi_c$
+above which we get percolation almost surely.  In contrast, for a purely power
+law distribution, removing many vertices should still keep the network intact.
+In contrast, our graph has a smooth relationship between average cluster size
+and occupation probability (with average cluster size declining slightly faster
+than the occupation probability).
+
+# The overreporting model
+
+The above simulation looked at the underreporting model (i.e. we assumed that if
+any household reported a link with another, that such a link exists).  We now
+examine percolation in the overreporting model (we only say a link exists when
+both households report the link).  Note that in the overreporting model, the
+largest component does not extend over the whole network.
+
+We first (re)create the graph:
+
+```{r overreporting model create graph}
+# create the graph (see the basic statistics section for  documentation of the
+# procedure below)
+overreporting.df <- 
+    nyakatoke[nyakatoke$willingness_link1 == 1 & nyakatoke$willingness_link2 == 1,]
+g.overreporting <- igraph::graph_from_data_frame(overreporting.df, directed = FALSE)
+missing.vertices <- c(7, 30, 32, 46, 44, 65, 84, 88, 91, 96, 107, 110, 
+                      116, 117, 118, 119)
+g.overreporting <- (Reduce(f = function(x, y) {y + igraph::vertex(x)},
+       x = missing.vertices,
+       init = g.overreporting,
+       right = TRUE))
+g.overreporting <- igraph::simplify(g.overreporting)
+```
+
+We now perform the same simulation as above, but for the overreporting network:
+
+```{r percolation overreporting, fig.width=12, fig.height=8}
+S <- numeric(120) # vector to hold our results
+sim_size <- 1000 # Number of simulations
+i <- numeric(sim_size) # Vector to hold cluster sizes
+for (n in 0:119) {
+    # n is the number of nodes to remove
+    for (m in 1:sim_size) {
+        # m is the mth simulation
+        to_remove <- sample(1:119, n)
+        # randomly pick n of the 119 nodes to remove
+        i[m] <- components(
+            delete_vertices(g.overreporting, to_remove))$csize[1]/119
+        # calculate the size of the giant component and save the result to
+        # the variable i
+    }
+    S[n+1] <- mean(i)
+    # the average cluster size (after removing n nodes) is the average of the 
+    # i variable
+}
+my_df <- data.frame(phi = 1-(0:119)/119, S = S)
+# rbind(my_df, c(phi = 0, S = 1), c(phi = 1, S = 0))
+main = expression(paste("Occupaion Probability, ", phi, ", vs. size of giant cluster ", S))
+plot(my_df[1:117,], 
+     type = "l", 
+     main = main,
+     sub = "Overreporting Model",
+     xlab = expression(phi))
+```
+```
+
+# Discussion (overreporting model)
+
+As stated earlier, the largest component in the overreporting model does not
+cover all the nodes in the graph.  The size of the giant component also appears
+to breakdown much faster than in the underreporting model.  When about a quarter
+of the nodes are removed from the network, the largest component only connects
+half of the households.
