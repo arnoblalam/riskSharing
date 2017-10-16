@@ -1,6 +1,6 @@
 PackratFormat: 1.4
 PackratVersion: 0.4.8.1
-RVersion: 3.3.2
+RVersion: 3.4.0
 Repos: CRAN=https://mran.revolutionanalytics.com/snapshot/2016-11-01,
     CRANextra=http://www.stats.ox.ac.uk/pub/RWin
 
@@ -25,6 +25,12 @@ Package: Rcpp
 Source: CRAN
 Version: 0.12.9
 Hash: 7ab41cbe74918de8de87e435ef17e92d
+
+Package: Rsolnp
+Source: CRAN
+Version: 1.16
+Hash: 0a1d2ee00c132ac390e478e17003f4c0
+Requires: truncnorm
 
 Package: assertthat
 Source: CRAN
@@ -149,7 +155,7 @@ Requires: NMF, irlba, magrittr
 Package: irlba
 Source: CRAN
 Version: 2.1.2
-Hash: b3433ead7f8cd82b73f8f7541726e8ac
+Hash: cdc868ef643df6318f7c30d3c1695168
 
 Package: iterators
 Source: CRAN
@@ -284,6 +290,11 @@ Source: CRAN
 Version: 1.2
 Hash: 3857905737a164648031462bed6aa2ef
 Requires: Rcpp, assertthat, lazyeval
+
+Package: truncnorm
+Source: CRAN
+Version: 1.0-7
+Hash: eefedc58b087a7f09ae770b6e159acb7
 
 Package: whisker
 Source: CRAN
