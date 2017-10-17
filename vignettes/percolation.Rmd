@@ -60,7 +60,7 @@ g.underreporting <- igraph::graph_from_data_frame(underreporting.df,
 g.underreporting <- igraph::simplify(g.underreporting)
 ```
 
-We then implement the algorithm descrbed
+We then implement the algorithm described:
 
 ```{r percolation}
 S <- numeric(120) # vector to hold our results
@@ -83,16 +83,61 @@ for (n in 0:119) {
 }
 ```
 
-Let's put the results in a nice table/graph
+Let's put the results in a nice table/graph.  We will also overlay theoretical
+results for the size of the giant component for the Poisson random graph and the
+Power law graph.  These theoretical results are obrained by using the generating
+function framework described in (Newman Date).  The theoretical size of the
+giant component is given by $S=\phi[1-g_0(u)]$, where 
+$g_0(u)=\sum_{k=0}^\infty(p_k z^k)$.  We have to calculate the value of $u$,
+which is the average probability that a vertex is not connected to the giant
+component via a particular neighboring vertex.  This is given by 
+$u = 1 - \phi+\phi g_1(u)$ where $g_1(z) = \sum_{k=0}^\infty(q_k z^k)$,
+$q_k = \frac{(k+1) p_{k+1}}{<k>}$ and $<k>$ is the average degree of the network.
 
-```{r plot results, fig.width=12, fig.height=8}
-my_df <- data.frame(phi = 1-(0:119)/119, S = S)
+For the Possion case, the appropriate generating functions are:
+$$
+g_0(z)=e^{\lambda(z-1)}\\
+g_1(z)=e^{\lambda(z-1)}
+$$
+where $lambda$ is the average degree of the graph (same as $<k>$).  We first
+solve for $u$ (using the equation $u = 1 - \phi+\phi g_1(u)$) and then
+subsitute the results back into $S=\phi[1-g_0(u)]$.  For the Poisson case, we
+obtain:
+
+$$
+u = 1 - \phi - \frac{W(\lambda \phi-e^{-\lambda \phi})}{\lambda}\\
+S = \frac{W(-\lambda \phi e^{-\lambda \phi})}{\lambda}
+$$
+
+For the power law case, we obtain
+
+$$
+g_0 = \frac{Li_\alpha(z)}{\zeta(\alpha)}\\
+g_1 = \frac{Li_{\alpha - 1}(z)}{z \zeta(\alpha - 1)}
+$$
+
+```{r phi v S underrepprting}
+my_df <- data.frame(phi = 1 - (0:119)/119, S = S)
 # rbind(my_df, c(phi = 0, S = 1), c(phi = 1, S = 0))
 main = expression(paste("Occupaion Probability, ", phi, ", vs. size of giant cluster ", S))
 plot(my_df[1:117,], 
      type = "l", 
      main = main,
      xlab = expression(phi))
+# We will also add the theoretical results - first exponential
+library(gsl) # For Lambert's W function
+lambda <- mean(degree(g.underreporting))
+plot(function(phi) phi+lambert_W0(-lambda * phi * exp(-lambda*phi))/lambda, from = 0, to = 1, add = TRUE, 
+     col = "red")
+
+# Now the power law theoretical results.  We first obtain the MLE estimates
+# alpha <- power.law.fit(degree(g.underreporting))$alpha
+# k <- degree(g.underreporting)
+# Ek <- mean(k)
+# Ek2 <- mean(k^2)
+# phi_c <- Ek/(Ek2 - Ek)
+# plot(function(phi) (2*Ek/0.810891)*(phi  - phi_c)/phi_c, from = 0, to = 1, add = TRUE, col = "blue")
+legend("topleft", legend = c("Simulation", "Poisson"), col = c("black", "red"), lty = c(1, 1))
 ```
 
 # Discussion
@@ -166,7 +211,6 @@ plot(my_df[1:117,],
      main = main,
      sub = "Overreporting Model",
      xlab = expression(phi))
-```
 ```
 
 # Discussion (overreporting model)
