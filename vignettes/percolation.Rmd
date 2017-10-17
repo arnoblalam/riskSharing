@@ -211,6 +211,12 @@ plot(my_df[1:117,],
      main = main,
      sub = "Overreporting Model",
      xlab = expression(phi))
+lambda <- mean(degree(g.overreporting))
+plot(function(phi) phi+lambert_W0(-lambda * phi * exp(-lambda*phi))/lambda, from = 0, to = 1, add = TRUE, 
+     col = "red")
+
+
+legend("topleft", legend = c("Simulation", "Poisson"), col = c("black", "red"), lty = c(1, 1))
 ```
 
 # Discussion (overreporting model)
