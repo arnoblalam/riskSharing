@@ -99,7 +99,7 @@ $$
 g_0(z)=e^{\lambda(z-1)}\\
 g_1(z)=e^{\lambda(z-1)}
 $$
-where $lambda$ is the average degree of the graph (same as $<k>$).  We first
+where $\lambda$ is the average degree of the graph (same as $<k>$).  We first
 solve for $u$ (using the equation $u = 1 - \phi+\phi g_1(u)$) and then
 subsitute the results back into $S=\phi[1-g_0(u)]$.  For the Poisson case, we
 obtain:
@@ -112,11 +112,11 @@ $$
 For the power law case, we obtain
 
 $$
-g_0 = \frac{Li_\alpha(z)}{\zeta(\alpha)}\\
+g_0 = \frac{Li_\alpha(z)}{\zeta(\alpha)} \\
 g_1 = \frac{Li_{\alpha - 1}(z)}{z \zeta(\alpha - 1)}
 $$
 
-```{r phi v S underrepprting}
+```{r phi v S underrepprting, fig.width=6, fig.height=4}
 my_df <- data.frame(phi = 1 - (0:119)/119, S = S)
 # rbind(my_df, c(phi = 0, S = 1), c(phi = 1, S = 0))
 main = expression(paste("Occupaion Probability, ", phi, ", vs. size of giant cluster ", S))
@@ -184,7 +184,7 @@ g.overreporting <- igraph::simplify(g.overreporting)
 
 We now perform the same simulation as above, but for the overreporting network:
 
-```{r percolation overreporting, fig.width=12, fig.height=8}
+```{r percolation overreporting, fig.width=6, fig.height=4}
 S <- numeric(120) # vector to hold our results
 sim_size <- 1000 # Number of simulations
 i <- numeric(sim_size) # Vector to hold cluster sizes
