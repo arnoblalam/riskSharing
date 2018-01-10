@@ -125,9 +125,9 @@ plot(my_df[1:117,],
      main = main,
      xlab = expression(phi))
 # We will also add the theoretical results - first exponential
-library(gsl) # For Lambert's W function
+# library(gsl) # For Lambert's W function
 lambda <- mean(degree(g.underreporting))
-plot(function(phi) phi+lambert_W0(-lambda * phi * exp(-lambda*phi))/lambda, from = 0, to = 1, add = TRUE, 
+plot(function(phi) phi+gsl::lambert_W0(-lambda * phi * exp(-lambda*phi))/lambda, from = 0, to = 1, add = TRUE, 
      col = "red")
 
 # Now the power law theoretical results.  We first obtain the MLE estimates
@@ -199,11 +199,11 @@ for (n in 0:119) {
         # calculate the size of the giant component and save the result to
         # the variable i
     }
-    S[n+1] <- mean(i)
+    S[n + 1] <- mean(i)
     # the average cluster size (after removing n nodes) is the average of the 
     # i variable
 }
-my_df <- data.frame(phi = 1-(0:119)/119, S = S)
+my_df <- data.frame(phi = 1 - (0:119)/119, S = S)
 # rbind(my_df, c(phi = 0, S = 1), c(phi = 1, S = 0))
 main = expression(paste("Occupaion Probability, ", phi, ", vs. size of giant cluster ", S))
 plot(my_df[1:117,], 
@@ -212,7 +212,7 @@ plot(my_df[1:117,],
      sub = "Overreporting Model",
      xlab = expression(phi))
 lambda <- mean(degree(g.overreporting))
-plot(function(phi) phi+lambert_W0(-lambda * phi * exp(-lambda*phi))/lambda, from = 0, to = 1, add = TRUE, 
+plot(function(phi) phi + gsl::lambert_W0(-lambda * phi * exp(-lambda*phi))/lambda, from = 0, to = 1, add = TRUE, 
      col = "red")
 
 
