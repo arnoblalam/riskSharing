@@ -1,0 +1,48 @@
+---
+title: "Reading external survey data"
+author: "Arnob L. ALam"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Load Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Purpose
+
+This vignette shows how to read the data provided by 
+[(Fafchamps and Comola, 2013)] [1] and save the data is a .RData file that can
+bse used in later analysis.
+
+# Setting up R
+
+We first create some variables to store things like the path to the
+root of the project and the external data folder.  The vairables are as follows
+
+* `baseLoc` - The location of the "root" of the project (all files and folders
+    related to the project are below this folder).
+* `extPath` - The location of "external data".  Example of external data is
+    the result from the Nyakatoke village survey saved in CSV format.
+* `dataPath` - The location of "internal data".  This is data that has been
+    taken from the external source and converted to R format. For example, the
+    Nyakatoke village data (from the external data folder) saved in .RData
+    format.
+
+```{r setup}
+baseLoc <- system.file(package="riskSharing")
+extPath <- file.path(baseLoc, "extdata")
+dataPath <- file.path("data")
+```
+
+# Reading and saving data
+
+The Nyakatoke village survey data is saved in the file "tanzanaia_data.csv" in
+the external data folder.  This data is obtained by converting the Stata file
+provided by [(Fafchamps and Comola, 2013)] [1]
+
+```{r read-and-save, eval=FALSE}
+nyakatoke <- read.csv(file.path(extPath,"tanzania_data.csv"))
+save(nyakatoke, file = file.path(dataPath, "nyakatoke.RData"))
+```
+[1]: http://onlinelibrary.wiley.com/doi/10.1111/ecoj.12071/abstract "Comola, M. and Fafchamps, M. (2014), Testing Unilateral and Bilateral Link Formation. Econ J, 124: 954–976. doi:10.1111/ecoj.12071"

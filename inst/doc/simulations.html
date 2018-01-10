@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Arnob Alam" />
+
+<meta name="date" content="2018-01-10" />
+
+<title>Graph simulations</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Graph simulations</h1>
+<h4 class="author"><em>Arnob Alam</em></h4>
+<h4 class="date"><em>2018-01-10</em></h4>
+
+
+
+<div id="purpose" class="section level1">
+<h1>Purpose</h1>
+<p>In this vignette we simulate some random graphs and compare the results with the observed network</p>
+</div>
+<div id="preliminary" class="section level1">
+<h1>Preliminary</h1>
+<p>As a reminder, we recreate the graphs (from the basic descriptive statistics vignette)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(riskSharing)
+<span class="kw">data</span>(<span class="st">&quot;nyakatoke&quot;</span>)
+
+edgelist &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(nyakatoke[nyakatoke$willingness_link1 ==<span class="st"> </span><span class="dv">1</span>, <span class="dv">1</span>:<span class="dv">2</span>])
+g.directed &lt;-<span class="st"> </span>igraph::<span class="kw">graph_from_data_frame</span>(edgelist)
+
+underreporting.df &lt;-<span class="st"> </span>
+<span class="st">    </span>nyakatoke[nyakatoke$willingness_link1 ==<span class="st"> </span><span class="dv">1</span> |<span class="st"> </span>nyakatoke$willingness_link2 ==<span class="st"> </span><span class="dv">1</span>,]
+g.underreporting &lt;-<span class="st"> </span>igraph::<span class="kw">graph_from_data_frame</span>(underreporting.df, 
+                                                  <span class="dt">directed =</span> <span class="ot">FALSE</span>)
+g.underreporting &lt;-<span class="st"> </span>igraph::<span class="kw">simplify</span>(g.underreporting)
+
+overreporting.df &lt;-<span class="st"> </span>
+<span class="st">    </span>nyakatoke[nyakatoke$willingness_link1 ==<span class="st"> </span><span class="dv">1</span> &amp;<span class="st"> </span>nyakatoke$willingness_link2 ==<span class="st"> </span><span class="dv">1</span>,]
+g.overreporting &lt;-<span class="st"> </span>igraph::<span class="kw">graph_from_data_frame</span>(overreporting.df, 
+                                                 <span class="dt">directed =</span> <span class="ot">FALSE</span>)
+missing.vertices &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">30</span>, <span class="dv">32</span>, <span class="dv">46</span>, <span class="dv">44</span>, <span class="dv">65</span>, <span class="dv">84</span>, <span class="dv">88</span>, <span class="dv">91</span>, <span class="dv">96</span>, <span class="dv">107</span>, <span class="dv">110</span>, 
+                      <span class="dv">116</span>, <span class="dv">117</span>, <span class="dv">118</span>, <span class="dv">119</span>)
+g.overreporting &lt;-<span class="st"> </span>(<span class="kw">Reduce</span>(<span class="dt">f =</span> function(x, y) {y +<span class="st"> </span>igraph::<span class="kw">vertex</span>(x)},
+       <span class="dt">x =</span> missing.vertices,
+       <span class="dt">init =</span> g.overreporting,
+       <span class="dt">right =</span> <span class="ot">TRUE</span>))</code></pre></div>
+</div>
+<div id="simulation-parameters" class="section level1">
+<h1>Simulation parameters</h1>
+<p>For the simulations, we need to specify the size and order or average degree (depending on the type of simulation we are performing) of the random graphs we wish to create, as well as the number of simulations we wish to run. The order of the graph will be 119 (the number of the households in the survey).<br />
+The size of the graph will depend on the underlying graph we are trying to simulate (e.g. the directed/desire-to-link graph, the underreporting graph and the overreporting graph).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.size &lt;-<span class="st"> </span><span class="dv">1000</span>
+sim.order &lt;-<span class="st"> </span><span class="dv">119</span>
+size.directed &lt;-<span class="st"> </span>igraph::<span class="kw">gsize</span>(g.directed)
+size.underreporting &lt;-<span class="st"> </span>igraph::<span class="kw">gsize</span>(g.underreporting)
+size.overreporting &lt;-<span class="st"> </span>igraph::<span class="kw">gsize</span>(g.overreporting)
+avg.degree.directed &lt;-<span class="st"> </span><span class="kw">mean</span>(igraph::<span class="kw">degree</span>(g.directed, <span class="dt">mode =</span> <span class="st">&quot;out&quot;</span>))
+avg.degree.underreporting &lt;-<span class="st"> </span><span class="kw">mean</span>(igraph::<span class="kw">degree</span>(g.underreporting))
+avg.degree.overreporting &lt;-<span class="st"> </span><span class="kw">mean</span>(igraph::<span class="kw">degree</span>(g.overreporting))</code></pre></div>
+</div>
+<div id="simulations" class="section level1">
+<h1>Simulations</h1>
+<p>We are now ready to start simulating random graphs in order to examine how their properties line up with the observed network. We will run three sets of simulations:</p>
+<ol style="list-style-type: decimal">
+<li><p>The Erdős–Rényi <span class="math inline">\(G(n, M)\)</span> model, which samples uniformly from the set of all possible graphs of <span class="math inline">\(n\)</span> vertices and <span class="math inline">\(M\)</span> edges. We set <span class="math inline">\(n = 119\)</span> and <span class="math inline">\(M\)</span> equal to the order of the graph we are trying to simulate.</p></li>
+<li><p>The Erdős–Rényi <span class="math inline">\(G(n, p)\)</span> model, is constructed by connecting nodes randomly. Each edge is included in the graph with probability <span class="math inline">\(p\)</span> independent from every other edge. We set <span class="math inline">\(p\)</span> equal to the average degree of the graph divided by 119.</p></li>
+<li><p>The degree sequence graph samples uniformly from all possible graphs with the same degree sequence as the underlying graph we are trying to simulate.</p></li>
+</ol>
+<div id="erdosrenyi-gn-m" class="section level2">
+<h2>Erdős–Rényi <span class="math inline">\(G(n, M)\)</span></h2>
+<p>Here we simulate using the Erdős–Rényi <span class="math inline">\(G(n, M)\)</span> model. We start by simulating the underreporting model.</p>
+<div id="underreporting-model" class="section level3">
+<h3>Underreporting model</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">underreporting.sim &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dt">n =</span> sim.size,
+                                igraph::<span class="kw">sample_gnm</span>(sim.order, size.underreporting), 
+                                <span class="dt">simplify =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p>Now let’s get some basic statistics about our simulated graphs. We start by examining the size and order of the graph. Since these are set as simulation parameters, all the generated graphs should have an order of 119 and size of 490. Also, since the size and order of the graph are fixed, the average number of connections per node is alo fixed at (2*490)/119 = 8.235294.</p>
+<div id="size-order-and-degree" class="section level4">
+<h4>Size, Order and Degree</h4>
+<p>We verify this below.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># The order of all the graphs should be sim.order = 119 and the size should be </span>
+<span class="co"># size.underreporting = 490</span>
+<span class="kw">all</span>(<span class="kw">sapply</span>(underreporting.sim, igraph::gorder) ==<span class="st"> </span>sim.order)</code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">all</span>(<span class="kw">sapply</span>(underreporting.sim, igraph::gsize) ==<span class="st"> </span>size.underreporting)</code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">all</span>(<span class="kw">sapply</span>(underreporting.sim, function (x) <span class="kw">mean</span>(igraph::<span class="kw">degree</span>(x)))
+        ==<span class="st">  </span><span class="dv">2</span>*size.underreporting/sim.order)</code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="global-clustering-coefficient" class="section level4">
+<h4>Global Clustering Coefficient</h4>
+<p>We next examine the clustering coefficient of the generated graphs. We start with the “global cluserting coefficient”:</p>
+<p><span class="math display">\[
+Cl(g) = \frac{\sum_{i; j \ne i; k \ne j, i}g_{ij} g_{jk} g_{ik}}{\sum_{i; j \ne i; k \ne j, i}g_{ij} g_{jk}}
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">underreporting.cc &lt;-<span class="st"> </span><span class="kw">sapply</span>(underreporting.sim, 
+                            function(x) igraph::<span class="kw">transitivity</span>(x))
+<span class="kw">summary</span>(underreporting.cc)</code></pre></div>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.04588 0.06484 0.06927 0.06927 0.07371 0.08749</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">round</span>(<span class="kw">quantile</span>(underreporting.cc, <span class="kw">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>)), <span class="dv">3</span>)</code></pre></div>
+<pre><code>##  2.5% 97.5% 
+## 0.057 0.083</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">h &lt;-<span class="st"> </span><span class="kw">hist</span>(underreporting.cc, <span class="dt">plot =</span> <span class="ot">FALSE</span>)
+h$density &lt;-<span class="st"> </span>h$counts/<span class="kw">sum</span>(h$counts)
+<span class="kw">plot</span>(h, 
+     <span class="dt">freq =</span> <span class="ot">FALSE</span>,
+     <span class="dt">xlab =</span> <span class="st">&quot;Clustering Coefficient&quot;</span>,
+     <span class="dt">main =</span> <span class="st">&quot;Distribtuion of Global Clustering Coefficients</span>
+<span class="st">     in Erdos-Renyi simulations&quot;</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="local-clustering-coefficient" class="section level4">
+<h4>LOcal Clustering Coefficient</h4>
+<p>An alternative to the global clustering coefficient is the average local clustering coefficient. For each vertex on the graph, we calculate a local clustering coefficient at the node.</p>
+<p><span class="math display">\[
+Cl_i(g) = \frac{\sum_{i; j \ne i; k \ne j, i}g_{ij} g_{jk} g_{ik}}{\sum_{j \ne i; k \ne j, i}g_{ij} g_{jk}}
+\]</span></p>
+<p>We then calculate the average clustering coefficient for the whole graph:</p>
+<p><span class="math display">\[
+Cl^{Avg}(g) = \frac{1}{n} \sum_i Cl_i(g)
+\]</span></p>
+<p>where <span class="math inline">\(n\)</span> is the order of the graph (119 in our case).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">underreporting.local.cc &lt;-<span class="st"> </span><span class="kw">sapply</span>(underreporting.sim, function(g) {
+    <span class="kw">mean</span>(igraph::<span class="kw">transitivity</span>(<span class="dt">graph =</span> g, <span class="dt">type =</span> <span class="st">&quot;local&quot;</span>, <span class="dt">isolates =</span> <span class="st">&quot;zero&quot;</span>))
+})
+
+<span class="kw">round</span>(<span class="kw">quantile</span>(underreporting.local.cc, <span class="kw">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>)), <span class="dv">3</span>)</code></pre></div>
+<pre><code>##  2.5% 97.5% 
+## 0.055 0.086</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">h &lt;-<span class="st"> </span><span class="kw">hist</span>(underreporting.local.cc, <span class="dt">plot =</span> <span class="ot">FALSE</span>)
+h$density &lt;-<span class="st"> </span>h$counts/<span class="kw">sum</span>(h$counts)
+<span class="kw">plot</span>(h, 
+     <span class="dt">freq =</span> <span class="ot">FALSE</span>,
+     <span class="dt">xlab =</span> <span class="st">&quot;Local Clustering Coefficient&quot;</span>,
+     <span class="dt">main =</span> <span class="st">&quot;Distribtuion of Local Clustering Coefficients</span>
+<span class="st">     in Erdos-Renyi simulations&quot;</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+</div>
+<div id="overreporting-model" class="section level3">
+<h3>Overreporting Model</h3>
+<p>We now repeat the analysis for the overreporting model.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">overreporting.sim &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dt">n =</span> sim.size,
+                                igraph::<span class="kw">sample_gnm</span>(sim.order, size.overreporting), 
+                                <span class="dt">simplify =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<div id="size-order-and-degree-1" class="section level4">
+<h4>Size, order and Degree</h4>
+<p>For the overreporting model, the order of all the simulated graphs should</p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 packrat/lib*/
 .Rproj.user
-inst/doc
+# inst/doc
 # History files
 .Rhistory
 .Rapp.history

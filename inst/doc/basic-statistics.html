@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Arnob L. Alam" />
+
+<meta name="date" content="2018-01-10" />
+
+<title>Basic Descriptive Statistics</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Basic Descriptive Statistics</h1>
+<h4 class="author"><em>Arnob L. Alam</em></h4>
+<h4 class="date"><em>2018-01-10</em></h4>
+
+
+
+<div id="purpose" class="section level1">
+<h1>Purpose</h1>
+<p>This vigentte shows some basic descriptive statstics about the networks fomred by the Nyakatoke Village survey.</p>
+</div>
+<div id="survey-and-data-organization" class="section level1">
+<h1>Survey and data organization</h1>
+<p>The survey data comes from (Fafchamps and Comola, 2013) [1]. They provide the following description of the data</p>
+<blockquote>
+<p>The Tanzanian data set comes from a village community named Nyakatoke in the Buboka Rural District of Tanzania, at the west of Lake Victoria. The data set is a census covering all 119 households in the village and includes information on households’ demographics, wealth and assets, income sources and income shocks, transfers and interpersonal relations…</p>
+</blockquote>
+<blockquote>
+<p>During the first survey round, each adult in the village was asked: ‘Can you give a list of people from inside or outside of Nyakatoke, who you can personally rely on for help and/or that can rely on you for help in cash, kind or labour?’Aggregated at the level of each household, the responses to this question constitute variables <span class="math inline">\(g_{ij}^{i}\)</span> and <span class="math inline">\(g_{ji}^j\)</span>. In other words, <span class="math inline">\(g_{ij}^{i} = 1\)</span> if an adult member of household <span class="math inline">\(i\)</span> mentions an adult member of household <span class="math inline">\(j\)</span> in their response to the above question.</p>
+</blockquote>
+<p>In the data, the households are given a number from 1 through 119. The columns <code>hh1</code> and <code>hh2</code> are the IDs of two households. <code>willingness_link1</code> takes on a value of <span class="math inline">\(1\)</span> if at least one adult member from the household identified by <code>hh1</code> mentioned someone from the household identified by <code>hh2</code> in their answer to the question “Can you give a list of people from inside or outside of Nyakatoke, who you can personally rely on for help and/or that can rely on you for help in cash, kind or labour”? Similarly, <code>willingness_link2</code> takes on a value of 1 if a member of <code>hh2</code> listed someone from <code>hh1</code> to the same question.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(riskSharing)
+<span class="kw">data</span>(<span class="st">&quot;nyakatoke&quot;</span>)
+knitr::<span class="kw">kable</span>(<span class="kw">head</span>(nyakatoke[,<span class="dv">1</span>:<span class="dv">4</span>]))</code></pre></div>
+<table>
+<caption>The first few rows and four columns of data from the Nyakatoke village survey</caption>
+<thead>
+<tr class="header">
+<th align="right">hh1</th>
+<th align="right">hh2</th>
+<th align="right">willingness_link1</th>
+<th align="right">willingness_link2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">113</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">76</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">27</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">23</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>Here we see (from row 1) that household 113 and household 1 have no link betwwen them. From row 2, we see Household 76 and Household 1 might have a link because someone from household 1 mentioned household 76 in the answer to the survey. However, no one from household 76 mentioned anyone from household 1 in their answer. Finally, from row 3 we see there is a link between household 17 and household 1 (both <code>willingness_link1</code> and <code>willingness_link2</code> are 1).</p>
+<p>The definitions of these columns will be expanded upon when we use them in later analysis.</p>
+<p>Note that in our dataset, each pair of household shows up twice, once in the <code>hh1</code> column and again in the <code>hh2</code> column. For example, household 1 and household 76 show up as:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">knitr::<span class="kw">kable</span>(<span class="kw">subset</span>(nyakatoke[,<span class="dv">1</span>:<span class="dv">4</span>], (hh1 ==<span class="st"> </span><span class="dv">1</span> &amp;<span class="st"> </span>hh2 ==<span class="st"> </span><span class="dv">76</span>) |<span class="st"> </span>(hh1 ==<span class="st"> </span><span class="dv">76</span> &amp;<span class="st"> </span>hh2 ==<span class="st"> </span><span class="dv">1</span>)))</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">hh1</th>
+<th align="right">hh2</th>
+<th align="right">willingness_link1</th>
+<th align="right">willingness_link2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td align="right">76</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td>8937</td>
+<td align="right">1</td>
+<td align="right">76</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>Here we see the combination (household 76, household 1) show up in row 2 of the data and the combination (household 76, household 1) show up in row 8937 of the data. Looking at the <code>willingness_link1</code> and <code>willingness_link2</code> columns, we see that the data in these rows are just flipped versions of each other.</p>
+<p>The data also lists other characteristics of the housholds. Here we show a few rows and all columns of the dataset.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">knitr::<span class="kw">kable</span>(<span class="kw">head</span>(nyakatoke))</code></pre></div>
+<table>
+<caption>All columns from in the data.</caption>
+<thead>
+<tr class="header">
+<th align="right">hh1</th>
+<th align="right">hh2</th>
+<th align="right">willingness_link1</th>
+<th align="right">willingness_link2</th>
+<th align="right">asymmetric_bilateral1</th>
+<th align="right">asymmetric_bilateral2</th>
+<th align="right">asymmetric_unilateral1</th>
+<th align="right">asymmetric_unilateral2</th>
+<th align="right">kinship1</th>
+<th align="right">kinship2</th>
+<th align="right">excess_wealth1</th>
+<th align="right">excess_wealth2</th>
+<th align="right">same_edu1</th>
+<th align="right">same_edu2</th>
+<th align="right">members1</th>
+<th align="right">members2</th>
+<th align="right">o_members1</th>
+<th align="right">o_members2</th>
+<th align="right">neighbors1</th>
+<th align="right">neighbors2</th>
+<th align="right">popularity1</th>
+<th align="right">popularity2</th>
+<th align="right">const1</th>
+<th align="right">const2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">113</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">15.882445</td>
+<td align="right">-15.882445</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.9</td>
+<td align="right">0.2</td>
+<td align="right">1</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="right">76</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">11.311359</td>
+<td align="right">-11.311359</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.9</td>
+<td align="right">0.5</td>
+<td align="right">1</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">-9.991581</td>
+<td align="right">9.991581</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">9</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">9</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0.8</td>
+<td align="right">2.2</td>
+<td align="right">1</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="right">27</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">16.196249</td>
+<td align="right">-16.196249</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0.9</td>
+<td align="right">0.4</td>
+<td align="right">1</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">14.054485</td>
+<td align="right">-14.054485</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0.9</td>
+<td align="right">0.3</td>
+<td align="right">1</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="right">23</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">15.305475</td>
+<td align="right">-15.305475</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0.9</td>
+<td align="right">0.5</td>
+<td align="right">1</td>
+<td align="right">2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="several-networks-from-underlying-data" class="section level1">
+<h1>Several networks from underlying data</h1>
+<p>Using the data from the survey, we can create several networks. We create the following three networks (more details about what each network represents is provided in our paper).</p>
+<ol style="list-style-type: decimal">
+<li><p>A <em>directed network</em>. If (an adult member of) household 1 lists (somenoe from) household 2 as an answer to the relevant survey question, we say there is a directed link FROM household 1 TO household 2. This corrsponds to the desire to link model in our paper.</p></li>
+<li><p>An <em>undirected network assuming links are underreported</em>. In this case, if an (adult member) from household 1 mentions someone from household 2 as an answer to the relevant survey question, we say there is an undirected link between the two households. This corresponds to the underreporting model in our paper.</p></li>
+<li><p>An <em>undirected network assuming links are overreported</em>. In this case, if members from both households list someone from the other household as an answer to the relevant survey question, we say there is an undirected link between the two households. This corresponds to the overreporting model in our paper.</p></li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># For the desire to link data, we create an &quot;edgelist&quot; that igraph can read.</span>
+<span class="co"># This is a list of households where the first household in the pair mentioned</span>
+<span class="co"># someone from household 2 in their survey response.</span>
+edgelist &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(nyakatoke[nyakatoke$willingness_link1 ==<span class="st"> </span><span class="dv">1</span>, <span class="dv">1</span>:<span class="dv">2</span>])
+g.directed &lt;-<span class="st"> </span>igraph::<span class="kw">graph_from_data_frame</span>(edgelist)
+
+<span class="co"># For the underreporting model, we create a graph from the dataframe</span>
+<span class="co"># First we keep only the rows where at least one houshold said the other is in</span>
+<span class="co"># their network.</span>
+underreporting.df &lt;-<span class="st"> </span>
+<span class="st">    </span>nyakatoke[nyakatoke$willingness_link1 ==<span class="st"> </span><span class="dv">1</span> |<span class="st"> </span>nyakatoke$willingness_link2 ==<span class="st"> </span><span class="dv">1</span>,]
+<span class="co"># We then convert this into an undirected graph</span>
+g.underreporting &lt;-<span class="st"> </span>igraph::<span class="kw">graph_from_data_frame</span>(underreporting.df, 
+                                                  <span class="dt">directed =</span> <span class="ot">FALSE</span>)
+<span class="co"># We then remove any multiple edges</span>
+g.underreporting &lt;-<span class="st"> </span>igraph::<span class="kw">simplify</span>(g.underreporting)
+
+<span class="co"># For the overreporting model we only keep those rows where both households</span>
+<span class="co"># listed the other in their network</span>
+overreporting.df &lt;-<span class="st"> </span>
+<span class="st">    </span>nyakatoke[nyakatoke$willingness_link1 ==<span class="st"> </span><span class="dv">1</span> &amp;<span class="st"> </span>nyakatoke$willingness_link2 ==<span class="st"> </span><span class="dv">1</span>,]
+<span class="co"># We then create an graph</span>
+g.overreporting &lt;-<span class="st"> </span>igraph::<span class="kw">graph_from_data_frame</span>(overreporting.df, <span class="dt">directed =</span> <span class="ot">FALSE</span>)
+<span class="co"># From examining the list of vertices, we note that households 7, 30 32, 36, 44,</span>
+<span class="co"># 65, 84, 88, 91, 96, 107, 110, 116, 117, 118 and 119 don't show up in the </span>
+<span class="co"># graph. This is because there is no case where these households list another </span>
+<span class="co"># household in their support network and they do the same.  We dd back these </span>
+<span class="co"># vertices as isolated vertices</span>
+missing.vertices &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">30</span>, <span class="dv">32</span>, <span class="dv">46</span>, <span class="dv">44</span>, <span class="dv">65</span>, <span class="dv">84</span>, <span class="dv">88</span>, <span class="dv">91</span>, <span class="dv">96</span>, <span class="dv">107</span>, <span class="dv">110</span>, 
+                      <span class="dv">116</span>, <span class="dv">117</span>, <span class="dv">118</span>, <span class="dv">119</span>)
+g.overreporting &lt;-<span class="st"> </span>(<span class="kw">Reduce</span>(<span class="dt">f =</span> function(x, y) {y +<span class="st"> </span>igraph::<span class="kw">vertex</span>(x)},
+       <span class="dt">x =</span> missing.vertices,
+       <span class="dt">init =</span> g.overreporting,
+       <span class="dt">right =</span> <span class="ot">TRUE</span>))
+<span class="co"># We remove multiple edges</span>
+g.overreporting &lt;-<span class="st"> </span>igraph::<span class="kw">simplify</span>(g.overreporting)</code></pre></div>
+<p>Now that we have created the graphs, we report some basic descriptive statistics for each graph:</p>
+<ol style="list-style-type: decimal">
+<li>The number of vertices</li>
+<li>The number of edges</li>
+<li>The average degree (or average in-degree and out-degree for a directed graph)</li>
+<li>The average path length</li>
+</ol>
+<div id="directed-graph" class="section level2">
+<h2>Directed Graph</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">descriptive_stats</span>(g.directed)</code></pre></div>
+<pre><code>## Order:            119 
+## Size:             630 
+## Diameter:         5 
+## Average Path Length:  3.16 
+## Average in-degree:    5.294 
+## Average out-degree:   5.294 
+## Clustering Coefficient:   0.19</code></pre>
+</div>
+<div id="undirected-graph" class="section level2">
+<h2>Undirected graph</h2>
+<div id="underreporting-model" class="section level3">
+<h3>Underreporting model</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">descriptive_stats</span>(g.underreporting)</code></pre></div>
+<pre><code>## Order:            119 
+## Size:             490 
+## Diameter:         5 
+## Average Path Length:  2.563 
+## Average degree:       8.235 
+## Clustering Coefficient:   0.19</code></pre>
+</div>
+<div id="overreporting-model" class="section level3">
+<h3>Overreporting Model</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">descriptive_stats</span>(g.overreporting)</code></pre></div>
+<pre><code>## Order:            119 
+## Size:             140 
+## Diameter:         11 
+## Average Path Length:  4.795 
+## Average degree:       2.353 
+## Clustering Coefficient:   0.08</code></pre>
+</div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
