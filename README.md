@@ -13,7 +13,7 @@ install.packages("devtools")
 2. Install this package from gitHub
 
 ```{r}
-devtoools::("arnoblalam/riskSharing")
+devtoools::install_github("arnoblalam/riskSharing")
 ```
 
 3.  Look at the associated code examples
