@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Arnob Alam" />
+
+<meta name="date" content="2018-01-10" />
+
+<title>Percolation on Risk Sharing network</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Percolation on Risk Sharing network</h1>
+<h4 class="author"><em>Arnob Alam</em></h4>
+<h4 class="date"><em>2018-01-10</em></h4>
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This vignette simulates site percolation in our risk sharing network. <em>Site percolation</em> refers to the random removal of nodes on the network. In our network this could be due to migration, death, or agents simply opting out of their obligations (default). We are interested in whether the network is connected (that is, a giant component exists) after a fraction <span class="math inline">\(\phi_c\)</span> of the nodes are randomly removed.</p>
+</div>
+<div id="algorithm" class="section level1">
+<h1>Algorithm</h1>
+<p>We use the following algorithms to simulate percolation (our graph has 119 vertices):</p>
+<ol style="list-style-type: decimal">
+<li>Start with n = 1, m = 1, i = 0, sim_size = 1000</li>
+<li>Randomly remove n out of 119 vertices from the graph</li>
+<li>Calculate the size of the relative size of the largest connected component (number of nodes in largest component/119)</li>
+<li>Store the results of step 4 in i</li>
+<li>Increase m by 1</li>
+<li>If m &lt; sim_size, go back to step 2</li>
+<li>Calculate <span class="math inline">\(S\)</span> the average size of giant component as <span class="math inline">\(S = \frac{i}{sim\_size}\)</span></li>
+<li>Increse n by 1</li>
+<li>If n &lt; 118, return to step 2</li>
+</ol>
+</div>
+<div id="results" class="section level1">
+<h1>Results</h1>
+<p>We implment the algorithm below. First we load the data and create the graph</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Load package</span>
+<span class="kw">library</span>(igraph)
+<span class="kw">library</span>(riskSharing)
+
+<span class="co">#Get data</span>
+<span class="kw">data</span>(<span class="st">&quot;nyakatoke&quot;</span>)
+
+<span class="co"># Create the underreporting graph</span>
+
+<span class="co"># For the underreporting model, we create a graph from the dataframe</span>
+<span class="co"># First we keep only the rows where at least one houshold said the other is in</span>
+<span class="co"># their network.</span>
+underreporting.df &lt;-<span class="st"> </span>
+<span class="st">    </span>nyakatoke[nyakatoke$willingness_link1 ==<span class="st"> </span><span class="dv">1</span> |<span class="st"> </span>nyakatoke$willingness_link2 ==<span class="st"> </span><span class="dv">1</span>,]
+<span class="co"># We then convert this into an undirected graph</span>
+g.underreporting &lt;-<span class="st"> </span>igraph::<span class="kw">graph_from_data_frame</span>(underreporting.df, 
+                                                  <span class="dt">directed =</span> <span class="ot">FALSE</span>)
+<span class="co"># We then remove any multiple edges</span>
+g.underreporting &lt;-<span class="st"> </span>igraph::<span class="kw">simplify</span>(g.underreporting)</code></pre></div>
+<p>We then implement the algorithm described:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">S &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="dv">120</span>) <span class="co"># vector to hold our results</span>
+sim_size &lt;-<span class="st"> </span><span class="dv">1000</span> <span class="co"># Number of simulations</span>
+i &lt;-<span class="st"> </span><span class="kw">numeric</span>(sim_size) <span class="co"># Vector to hold cluster sizes</span>
+for (n in <span class="dv">0</span>:<span class="dv">119</span>) {
+    <span class="co"># n is the number of nodes to remove</span>
+    for (m in <span class="dv">1</span>:sim_size) {
+        <span class="co"># m is the mth simulation</span>
+        to_remove &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">119</span>, n)
+        <span class="co"># randomly pick n of the 119 nodes to remove</span>
+        i[m] &lt;-<span class="st"> </span><span class="kw">components</span>(
+            <span class="kw">delete_vertices</span>(g.underreporting, to_remove))$csize[<span class="dv">1</span>]/<span class="dv">119</span>
+        <span class="co"># calculate the size of the giant component and save the result to</span>
+        <span class="co"># the variable i</span>
+    }
+    S[n<span class="dv">+1</span>] &lt;-<span class="st"> </span><span class="kw">mean</span>(i)
+    <span class="co"># the average cluster size (after removing n nodes) is the average of the </span>
+    <span class="co"># i variable</span>
+}</code></pre></div>
+<p>Let’s put the results in a nice table/graph. We will also overlay theoretical results for the size of the giant component for the Poisson random graph and the Power law graph. These theoretical results are obrained by using the generating function framework described in (Newman Date). The theoretical size of the giant component is given by <span class="math inline">\(S=\phi[1-g_0(u)]\)</span>, where <span class="math inline">\(g_0(u)=\sum_{k=0}^\infty(p_k z^k)\)</span>. We have to calculate the value of <span class="math inline">\(u\)</span>, which is the average probability that a vertex is not connected to the giant component via a particular neighboring vertex. This is given by <span class="math inline">\(u = 1 - \phi+\phi g_1(u)\)</span> where <span class="math inline">\(g_1(z) = \sum_{k=0}^\infty(q_k z^k)\)</span>, <span class="math inline">\(q_k = \frac{(k+1) p_{k+1}}{&lt;k&gt;}\)</span> and <span class="math inline">\(&lt;k&gt;\)</span> is the average degree of the network.</p>
+<p>For the Possion case, the appropriate generating functions are: <span class="math display">\[
+g_0(z)=e^{\lambda(z-1)}\\
+g_1(z)=e^{\lambda(z-1)}
+\]</span> where <span class="math inline">\(\lambda\)</span> is the average degree of the graph (same as <span class="math inline">\(&lt;k&gt;\)</span>). We first solve for <span class="math inline">\(u\)</span> (using the equation <span class="math inline">\(u = 1 - \phi+\phi g_1(u)\)</span>) and then subsitute the results back into <span class="math inline">\(S=\phi[1-g_0(u)]\)</span>. For the Poisson case, we obtain:</p>
+<p><span class="math display">\[
+u = 1 - \phi - \frac{W(\lambda \phi-e^{-\lambda \phi})}{\lambda}\\
+S = \frac{W(-\lambda \phi e^{-\lambda \phi})}{\lambda}
+\]</span></p>
+<p>For the power law case, we obtain</p>
+<p><span class="math display">\[
+g_0 = \frac{Li_\alpha(z)}{\zeta(\alpha)} \\
+g_1 = \frac{Li_{\alpha - 1}(z)}{z \zeta(\alpha - 1)}
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">phi =</span> <span class="dv">1</span> -<span class="st"> </span>(<span class="dv">0</span>:<span class="dv">119</span>)/<span class="dv">119</span>, <span class="dt">S =</span> S)
+<span class="co"># rbind(my_df, c(phi = 0, S = 1), c(phi = 1, S = 0))</span>
+main =<span class="st"> </span><span class="kw">expression</span>(<span class="kw">paste</span>(<span class="st">&quot;Occupaion Probability, &quot;</span>, phi, <span class="st">&quot;, vs. size of giant cluster &quot;</span>, S))
+<span class="kw">plot</span>(my_df[<span class="dv">1</span>:<span class="dv">117</span>,], 
+     <span class="dt">type =</span> <span class="st">&quot;l&quot;</span>, 
+     <span class="dt">main =</span> main,
+     <span class="dt">xlab =</span> <span class="kw">expression</span>(phi))
+<span class="co"># We will also add the theoretical results - first exponential</span>
+<span class="co"># library(gsl) # For Lambert's W function</span>
+lambda &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">degree</span>(g.underreporting))
+<span class="kw">plot</span>(function(phi) phi+gsl::<span class="kw">lambert_W0</span>(-lambda *<span class="st"> </span>phi *<span class="st"> </span><span class="kw">exp</span>(-lambda*phi))/lambda, <span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">to =</span> <span class="dv">1</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, 
+     <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>)
+
+<span class="co"># Now the power law theoretical results.  We first obtain the MLE estimates</span>
+<span class="co"># alpha &lt;- power.law.fit(degree(g.underreporting))$alpha</span>
+<span class="co"># k &lt;- degree(g.underreporting)</span>
+<span class="co"># Ek &lt;- mean(k)</span>
+<span class="co"># Ek2 &lt;- mean(k^2)</span>
+<span class="co"># phi_c &lt;- Ek/(Ek2 - Ek)</span>
+<span class="co"># plot(function(phi) (2*Ek/0.810891)*(phi  - phi_c)/phi_c, from = 0, to = 1, add = TRUE, col = &quot;blue&quot;)</span>
+<span class="kw">legend</span>(<span class="st">&quot;topleft&quot;</span>, <span class="dt">legend =</span> <span class="kw">c</span>(<span class="st">&quot;Simulation&quot;</span>, <span class="st">&quot;Poisson&quot;</span>), <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="dt">lty =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="discussion" class="section level1">
+<h1>Discussion</h1>
+<p>The graph displays the occupation probability <span class="math inline">\(\phi\)</span> (fraction of vertices remaining in the graph) vs. the percolation strength <span class="math inline">\(S\)</span> (the average size of the giant component). If we start off at the right hand of the graph, we get the original (connected) graph. As we move towards the left, more and more vertices are removed. We see that by the time we have removed about half the nodes, the percolation probability is around 48%, and after removing about 2/3 of the nodes, the percolation probability is 29%.</p>
+<p>Note that for Poisson random graphs, we would expect to see a critical <span class="math inline">\(\phi_c\)</span> above which we get percolation almost surely. In contrast, for a purely power law distribution, removing many vertices should still keep the network intact. In contrast, our graph has a smooth relationship between average cluster size and occupation probability (with average cluster size declining slightly faster than the occupation probability).</p>
+</div>
+<div id="the-overreporting-model" class="section level1">
+<h1>The overreporting model</h1>
+<p>The above simulation looked at the underreporting model (i.e. we assumed that if any household reported a link with another, that such a link exists). We now examine percolation in the overreporting model (we only say a link exists when both households report the link). Note that in the overreporting model, the largest component does not extend over the whole network.</p>
+<p>We first (re)create the graph:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create the graph (see the basic statistics section for  documentation of the</span>
+<span class="co"># procedure below)</span>
+overreporting.df &lt;-<span class="st"> </span>
+<span class="st">    </span>nyakatoke[nyakatoke$willingness_link1 ==<span class="st"> </span><span class="dv">1</span> &amp;<span class="st"> </span>nyakatoke$willingness_link2 ==<span class="st"> </span><span class="dv">1</span>,]
+g.overreporting &lt;-<span class="st"> </span>igraph::<span class="kw">graph_from_data_frame</span>(overreporting.df, <span class="dt">directed =</span> <span class="ot">FALSE</span>)
+missing.vertices &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">30</span>, <span class="dv">32</span>, <span class="dv">46</span>, <span class="dv">44</span>, <span class="dv">65</span>, <span class="dv">84</span>, <span class="dv">88</span>, <span class="dv">91</span>, <span class="dv">96</span>, <span class="dv">107</span>, <span class="dv">110</span>, 
+                      <span class="dv">116</span>, <span class="dv">117</span>, <span class="dv">118</span>, <span class="dv">119</span>)
+g.overreporting &lt;-<span class="st"> </span>(<span class="kw">Reduce</span>(<span class="dt">f =</span> function(x, y) {y +<span class="st"> </span>igraph::<span class="kw">vertex</span>(x)},
+       <span class="dt">x =</span> missing.vertices,
+       <span class="dt">init =</span> g.overreporting,
+       <span class="dt">right =</span> <span class="ot">TRUE</span>))
+g.overreporting &lt;-<span class="st"> </span>igraph::<span class="kw">simplify</span>(g.overreporting)</code></pre></div>
+<p>We now perform the same simulation as above, but for the overreporting network:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">S &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="dv">120</span>) <span class="co"># vector to hold our results</span>
+sim_size &lt;-<span class="st"> </span><span class="dv">1000</span> <span class="co"># Number of simulations</span>
+i &lt;-<span class="st"> </span><span class="kw">numeric</span>(sim_size) <span class="co"># Vector to hold cluster sizes</span>
+for (n in <span class="dv">0</span>:<span class="dv">119</span>) {
+    <span class="co"># n is the number of nodes to remove</span>
+    for (m in <span class="dv">1</span>:sim_size) {
+        <span class="co"># m is the mth simulation</span>
+        to_remove &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">119</span>, n)
+        <span class="co"># randomly pick n of the 119 nodes to remove</span>
+        i[m] &lt;-<span class="st"> </span><span class="kw">components</span>(
+            <span class="kw">delete_vertices</span>(g.overreporting, to_remove))$csize[<span class="dv">1</span>]/<span class="dv">119</span>
+        <span class="co"># calculate the size of the giant component and save the result to</span>
+        <span class="co"># the variable i</span>
+    }
+    S[n +<span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">mean</span>(i)
+    <span class="co"># the average cluster size (after removing n nodes) is the average of the </span>
+    <span class="co"># i variable</span>
+}
+my_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">phi =</span> <span class="dv">1</span> -<span class="st"> </span>(<span class="dv">0</span>:<span class="dv">119</span>)/<span class="dv">119</span>, <span class="dt">S =</span> S)
+<span class="co"># rbind(my_df, c(phi = 0, S = 1), c(phi = 1, S = 0))</span>
+main =<span class="st"> </span><span class="kw">expression</span>(<span class="kw">paste</span>(<span class="st">&quot;Occupaion Probability, &quot;</span>, phi, <span class="st">&quot;, vs. size of giant cluster &quot;</span>, S))
+<span class="kw">plot</span>(my_df[<span class="dv">1</span>:<span class="dv">117</span>,], 
+     <span class="dt">type =</span> <span class="st">&quot;l&quot;</span>, 
+     <span class="dt">main =</span> main,
+     <span class="dt">sub =</span> <span class="st">&quot;Overreporting Model&quot;</span>,
+     <span class="dt">xlab =</span> <span class="kw">expression</span>(phi))
+lambda &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">degree</span>(g.overreporting))
+<span class="kw">plot</span>(function(phi) phi +<span class="st"> </span>gsl::<span class="kw">lambert_W0</span>(-lambda *<span class="st"> </span>phi *<span class="st"> </span><span class="kw">exp</span>(-lambda*phi))/lambda, <span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">to =</span> <span class="dv">1</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, 
+     <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>)
+
+
+<span class="kw">legend</span>(<span class="st">&quot;topleft&quot;</span>, <span class="dt">legend =</span> <span class="kw">c</span>(<span class="st">&quot;Simulation&quot;</span>, <span class="st">&quot;Poisson&quot;</span>), <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="dt">lty =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="discussion-overreporting-model" class="section level1">
+<h1>Discussion (overreporting model)</h1>
+<p>As stated earlier, the largest component in the overreporting model does not cover all the nodes in the graph. The size of the giant component also appears to breakdown much faster than in the underreporting model. When about a quarter of the nodes are removed from the network, the largest component only connects half of the households.</p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

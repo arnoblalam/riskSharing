@@ -1,0 +1,187 @@
+---
+title: "Graph simulations"
+author: "Arnob Alam"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Graph Simulations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Purpose
+
+In this vignette we simulate some random graphs and compare the results with
+the observed network
+
+# Preliminary
+
+As a reminder, we recreate the graphs (from the basic descriptive statistics
+vignette)
+
+```{r}
+library(riskSharing)
+data("nyakatoke")
+
+edgelist <- as.matrix(nyakatoke[nyakatoke$willingness_link1 == 1, 1:2])
+g.directed <- igraph::graph_from_data_frame(edgelist)
+
+underreporting.df <- 
+    nyakatoke[nyakatoke$willingness_link1 == 1 | nyakatoke$willingness_link2 == 1,]
+g.underreporting <- igraph::graph_from_data_frame(underreporting.df, 
+                                                  directed = FALSE)
+g.underreporting <- igraph::simplify(g.underreporting)
+
+overreporting.df <- 
+    nyakatoke[nyakatoke$willingness_link1 == 1 & nyakatoke$willingness_link2 == 1,]
+g.overreporting <- igraph::graph_from_data_frame(overreporting.df, 
+                                                 directed = FALSE)
+missing.vertices <- c(7, 30, 32, 46, 44, 65, 84, 88, 91, 96, 107, 110, 
+                      116, 117, 118, 119)
+g.overreporting <- (Reduce(f = function(x, y) {y + igraph::vertex(x)},
+       x = missing.vertices,
+       init = g.overreporting,
+       right = TRUE))
+```
+
+# Simulation parameters
+
+For the simulations, we need to specify the size and order or average degree
+(depending on the type of simulation we are performing) of the random graphs
+we wish to create, as well as the number of simulations we wish to run.  The 
+order of the graph will be 119 (the number of the households in the survey).  
+The size of the graph will depend on the underlying graph we are trying to 
+simulate (e.g. the directed/desire-to-link graph, the underreporting graph and 
+the overreporting graph).
+
+```{r simulation parameters}
+sim.size <- 1000
+sim.order <- 119
+size.directed <- igraph::gsize(g.directed)
+size.underreporting <- igraph::gsize(g.underreporting)
+size.overreporting <- igraph::gsize(g.overreporting)
+avg.degree.directed <- mean(igraph::degree(g.directed, mode = "out"))
+avg.degree.underreporting <- mean(igraph::degree(g.underreporting))
+avg.degree.overreporting <- mean(igraph::degree(g.overreporting))
+```
+
+# Simulations
+
+We are now ready to start simulating random graphs in order to examine how their
+properties line up with the observed network.  We will run three sets of
+simulations:
+
+1. The Erdős–Rényi $G(n, M)$ model, which samples uniformly from the set of all
+    possible graphs of $n$ vertices and $M$ edges.  We set $n = 119$ and 
+    $M$ equal to the order of the graph we are trying to simulate.
+    
+2. The Erdős–Rényi $G(n, p)$ model, is constructed by connecting nodes randomly.
+    Each edge is included in the graph with probability $p$ independent from 
+    every other edge.  We set $p$ equal to the average degree of the graph
+    divided by 119.
+    
+3. The degree sequence graph samples uniformly from all possible graphs with
+    the same degree sequence as the underlying graph we are trying to simulate.
+    
+
+## Erdős–Rényi $G(n, M)$
+
+Here we simulate using the Erdős–Rényi $G(n, M)$ model.  We start by simulating
+the underreporting model.
+
+### Underreporting model
+
+```{r E-R-M underreporting simulation}
+underreporting.sim <- replicate(n = sim.size,
+                                igraph::sample_gnm(sim.order, size.underreporting), 
+                                simplify = FALSE)
+```
+
+Now let's get some basic statistics about our simulated graphs.  We start by
+examining the size and order of the graph.  Since these are set as simulation
+parameters, all the generated graphs should have an order of 119 and size of 490.
+Also, since the size and order of the graph are fixed, the average number of 
+connections per node is alo fixed at (2*490)/119 = 8.235294.
+
+#### Size, Order and Degree
+
+We verify this below.
+
+```{r underreporting size order and degree}
+# The order of all the graphs should be sim.order = 119 and the size should be 
+# size.underreporting = 490
+all(sapply(underreporting.sim, igraph::gorder) == sim.order)
+all(sapply(underreporting.sim, igraph::gsize) == size.underreporting)
+all(sapply(underreporting.sim, function (x) mean(igraph::degree(x)))
+        ==  2*size.underreporting/sim.order)
+```
+
+#### Global Clustering Coefficient
+
+We next examine the clustering coefficient of the generated graphs.  We start
+with the "global cluserting coefficient":
+
+$$
+Cl(g) = \frac{\sum_{i; j \ne i; k \ne j, i}g_{ij} g_{jk} g_{ik}}{\sum_{i; j \ne i; k \ne j, i}g_{ij} g_{jk}}
+$$
+
+```{r underreporting clustering coefficient, fig.width=6, fig.height=5}
+underreporting.cc <- sapply(underreporting.sim, 
+                            function(x) igraph::transitivity(x))
+summary(underreporting.cc)
+round(quantile(underreporting.cc, c(0.025, 0.975)), 3)
+h <- hist(underreporting.cc, plot = FALSE)
+h$density <- h$counts/sum(h$counts)
+plot(h, 
+     freq = FALSE,
+     xlab = "Clustering Coefficient",
+     main = "Distribtuion of Global Clustering Coefficients
+     in Erdos-Renyi simulations")
+```
+
+#### LOcal Clustering Coefficient
+
+An alternative to the global clustering coefficient is the average local
+clustering coefficient.  For each vertex on the graph, we calculate a local
+clustering coefficient at the node.
+
+$$
+Cl_i(g) = \frac{\sum_{i; j \ne i; k \ne j, i}g_{ij} g_{jk} g_{ik}}{\sum_{j \ne i; k \ne j, i}g_{ij} g_{jk}}
+$$
+
+We then calculate the average clustering coefficient for the whole graph:
+
+$$
+Cl^{Avg}(g) = \frac{1}{n} \sum_i Cl_i(g)
+$$
+
+where $n$ is the order of the graph (119 in our case).
+
+```{r underreporting local clustering, fig.width=6, fig.height=5}
+underreporting.local.cc <- sapply(underreporting.sim, function(g) {
+    mean(igraph::transitivity(graph = g, type = "local", isolates = "zero"))
+})
+
+round(quantile(underreporting.local.cc, c(0.025, 0.975)), 3)
+h <- hist(underreporting.local.cc, plot = FALSE)
+h$density <- h$counts/sum(h$counts)
+plot(h, 
+     freq = FALSE,
+     xlab = "Local Clustering Coefficient",
+     main = "Distribtuion of Local Clustering Coefficients
+     in Erdos-Renyi simulations")
+```
+
+### Overreporting Model
+
+We now repeat the analysis for the overreporting model.
+
+```{r overreporting simulation}
+overreporting.sim <- replicate(n = sim.size,
+                                igraph::sample_gnm(sim.order, size.overreporting), 
+                                simplify = FALSE)
+```
+
+#### Size, order and Degree
+
+For the overreporting model, the order of all the simulated graphs should 
