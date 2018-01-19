@@ -139,7 +139,7 @@ plot(h,
      in Erdos-Renyi simulations")
 ```
 
-#### LOcal Clustering Coefficient
+#### Local Clustering Coefficient
 
 An alternative to the global clustering coefficient is the average local
 clustering coefficient.  For each vertex on the graph, we calculate a local
@@ -185,3 +185,39 @@ overreporting.sim <- replicate(n = sim.size,
 #### Size, order and Degree
 
 For the overreporting model, the order of all the simulated graphs should 
+
+```{r degree distribution, fig.width=6, fig.height=5}
+dd.underreporting <- igraph::degree_distribution(g.underreporting, cumulative = TRUE)
+po.underreporting <- ppois(0:32, lambda = mean(igraph::degree(g.underreporting)))
+plot(y  = log10(1 - po.underreporting), x = log10(0:32), type = "b", xlab = "log k", 
+     ylab = "log 1-Pr(K>k)", main = "Nyakatoke degree distribution vs. fitted random network",
+     sub = "(a) Underreporting")
+lines(y  = log10(dd.underreporting), x = log10(0:32), col = "blue", type = "b")
+grid()
+legend("bottomleft", 
+       legend = c("Theoretical", "Observed"), col = c("black", "blue"),
+       lty = 1, pch = 1)
+
+dd.overreporting <- igraph::degree_distribution(g.overreporting, cumulative = TRUE)
+po.overreporting <- ppois(0:20, lambda = mean(igraph::degree(g.overreporting)))
+plot(y  = log10(1 - po.overreporting), x = log10(0:20), type = "b", xlab = "log k", ylab = "log 1-Pr(K>k)", sub = "(b) overreporting")
+lines(y  = log10(dd.overreporting), x = log10(0:20), col = "blue", type = "b")
+grid()
+legend("bottomleft", 
+       legend = c("Theoretical", "Observed"), col = c("black", "blue"),
+       lty = 1, pch = 1)
+
+dd.in_degree <- igraph::degree_distribution(g.directed, mode = "in", cumulative = TRUE)
+dd.out_degree <- igraph::degree_distribution(g.directed, mode = "out", cumulative = TRUE)
+po.in_degree <- ppois(0:23, lambda = mean(igraph::degree(g.directed, mode = "in")))
+po.out_degree <- ppois(0:19, lambda = mean(igraph::degree(g.directed, mode = "out")))
+plot(y  = log10(1 - po.in_degree), x = log10(0:23), type = "b", xlab = "log k", ylab = "log 1-Pr(K>k)", sub = "(c) desire-to-link")
+lines(y  = log10(dd.in_degree), x = log10(0:23), col = "blue", type = "b")
+lines(y  = log10(dd.out_degree), x = log10(0:19), col = "red", type = "b")
+lines(y  = log10(1 - po.out_degree), x = log10(0:19), col = "green", type = "b")
+grid()
+legend("bottomleft", 
+       legend = c("Theoretical in-degree", "Observed in-degree", "Theoretical out-dgree", "Observed out-degree"), col = c("black", "blue", "green", "red"),
+       lty = 1, pch = 1)
+
+```

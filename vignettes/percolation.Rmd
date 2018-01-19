@@ -40,7 +40,6 @@ We implment the algorithm below. First we load the data and create the graph
 
 ```{r load-data}
 # Load package
-library(igraph)
 library(riskSharing)
 
 #Get data
@@ -72,12 +71,12 @@ for (n in 0:119) {
         # m is the mth simulation
         to_remove <- sample(1:119, n)
         # randomly pick n of the 119 nodes to remove
-        i[m] <- components(
-            delete_vertices(g.underreporting, to_remove))$csize[1]/119
+        i[m] <- igraph::components(
+            igraph::delete_vertices(g.underreporting, to_remove))$csize[1]/119
         # calculate the size of the giant component and save the result to
         # the variable i
     }
-    S[n+1] <- mean(i)
+    S[n + 1] <- mean(i)
     # the average cluster size (after removing n nodes) is the average of the 
     # i variable
 }
@@ -112,32 +111,64 @@ $$
 For the power law case, we obtain
 
 $$
-g_0 = \frac{Li_\alpha(z)}{\zeta(\alpha)} \\
-g_1 = \frac{Li_{\alpha - 1}(z)}{z \zeta(\alpha - 1)}
+g_0(z) = \frac{Li_\alpha(z)}{\zeta(\alpha)} \\
+g_1(z) = \frac{Li_{\alpha - 1}(z)}{z \zeta(\alpha - 1)}
 $$
+Unfortunately, we are not unable to solve the above explicitly for $u(\phi)$.
+We therefore simulate percolation on a pure power law graph with the same
+power law exponent as the observed graph using the simulation algorithm above.
 
 ```{r phi v S underrepprting, fig.width=6, fig.height=4}
 my_df <- data.frame(phi = 1 - (0:119)/119, S = S)
 # rbind(my_df, c(phi = 0, S = 1), c(phi = 1, S = 0))
 main = expression(paste("Occupaion Probability, ", phi, ", vs. size of giant cluster ", S))
-plot(my_df[1:117,], 
+plot(my_df[1:120,], 
      type = "l", 
      main = main,
-     xlab = expression(phi))
+     xlab = expression(phi),
+     xlim = c(1,0))
 # We will also add the theoretical results - first exponential
-library(gsl) # For Lambert's W function
-lambda <- mean(degree(g.underreporting))
-plot(function(phi) phi+lambert_W0(-lambda * phi * exp(-lambda*phi))/lambda, from = 0, to = 1, add = TRUE, 
-     col = "red")
+lambda <- mean(igraph::degree(g.underreporting))
+plot(function(phi) phi + gsl::lambert_W0(-lambda * phi * exp(-lambda*phi))/lambda, 
+     from = 0, to = 1, add = TRUE, col = "red")
 
-# Now the power law theoretical results.  We first obtain the MLE estimates
-# alpha <- power.law.fit(degree(g.underreporting))$alpha
-# k <- degree(g.underreporting)
-# Ek <- mean(k)
-# Ek2 <- mean(k^2)
-# phi_c <- Ek/(Ek2 - Ek)
-# plot(function(phi) (2*Ek/0.810891)*(phi  - phi_c)/phi_c, from = 0, to = 1, add = TRUE, col = "blue")
-legend("topleft", legend = c("Simulation", "Poisson"), col = c("black", "red"), lty = c(1, 1))
+# Now the power law results.  We first obtain the MLE estimates of the power
+# law exponent
+alpha <- igraph::fit_power_law(igraph::degree(g.underreporting))$alpha
+# We then create a power law network
+g.power_law <- igraph::sample_fitness_pl(
+    no.of.nodes = length(igraph::V(g.underreporting)), 
+    no.of.edges = length(igraph::E(g.underreporting)), 
+    exponent.out = alpha, 
+    finite.size.correction = TRUE)
+# We then simulate percolation on this network using the above algorithm
+S <- numeric(120) # vector to hold our results
+sim_size <- 1000 # Number of simulations
+i <- numeric(sim_size) # Vector to hold cluster sizes
+for (n in 0:119) {
+    # n is the number of nodes to remove
+    for (m in 1:sim_size) {
+        # m is the mth simulation
+        to_remove <- sample(1:119, n)
+        # randomly pick n of the 119 nodes to remove
+        i[m] <- igraph::components(
+            igraph::delete_vertices(g.power_law, to_remove))$csize[1]/119
+        # calculate the size of the giant component and save the result to
+        # the variable i
+    }
+    S[n + 1] <- mean(i)
+    # the average cluster size (after removing n nodes) is the average of the
+    # i variable
+}
+
+# Let's plot
+lines(y = rev(S), x = (0:119)/119, col = "blue")
+
+# Add a legend
+legend("bottomleft", 
+       legend = c("Simulation", "Poisson", "Power Law"), 
+       col = c("black", "red", "blue"), 
+       lty = c(1, 1, 1))
 ```
 
 # Discussion
@@ -157,12 +188,19 @@ In contrast, our graph has a smooth relationship between average cluster size
 and occupation probability (with average cluster size declining slightly faster
 than the occupation probability).
 
+Note that for both the observed network and power-law network, we do not observe
+a sharp "phase transition" at the perclation threshold (indeed, there is no
+percolation threshold).  This is a common phenomenon in graphs with power-law (or
+truncated power-law) distriubtions--essentially, even as many vertices are removed,
+the network continues to function.
+
 # The overreporting model
 
 The above simulation looked at the underreporting model (i.e. we assumed that if
-any household reported a link with another, that such a link exists).  We now
-examine percolation in the overreporting model (we only say a link exists when
-both households report the link).  Note that in the overreporting model, the
+any household reported a link with another, that such a link exists).
+
+We now examine percolation in the overreporting model (we only say a link exists
+when both households report the link).  Note that in the overreporting model, the
 largest component does not extend over the whole network.
 
 We first (re)create the graph:
@@ -194,29 +232,65 @@ for (n in 0:119) {
         # m is the mth simulation
         to_remove <- sample(1:119, n)
         # randomly pick n of the 119 nodes to remove
-        i[m] <- components(
-            delete_vertices(g.overreporting, to_remove))$csize[1]/119
+        i[m] <- igraph::components(
+            igraph::delete_vertices(g.overreporting, to_remove))$csize[1]/119
         # calculate the size of the giant component and save the result to
         # the variable i
     }
-    S[n+1] <- mean(i)
+    S[n + 1] <- mean(i)
     # the average cluster size (after removing n nodes) is the average of the 
     # i variable
 }
-my_df <- data.frame(phi = 1-(0:119)/119, S = S)
+my_df <- data.frame(phi = 1 - (0:119)/119, S = S)
 # rbind(my_df, c(phi = 0, S = 1), c(phi = 1, S = 0))
 main = expression(paste("Occupaion Probability, ", phi, ", vs. size of giant cluster ", S))
-plot(my_df[1:117,], 
+plot(my_df[1:120,], 
      type = "l", 
      main = main,
      sub = "Overreporting Model",
-     xlab = expression(phi))
-lambda <- mean(degree(g.overreporting))
-plot(function(phi) phi+lambert_W0(-lambda * phi * exp(-lambda*phi))/lambda, from = 0, to = 1, add = TRUE, 
-     col = "red")
+     xlab = expression(phi),
+     xlim = c(1,0))
+lambda <- mean(igraph::degree(g.overreporting))
+plot(function(phi) phi + gsl::lambert_W0(-lambda * phi * exp(-lambda*phi))/lambda, 
+     from = 0, to = 1, add = TRUE, col = "red")
 
+# Now the power law results.  We first obtain the MLE estimates of the power
+# law exponent
+alpha <- igraph::fit_power_law(igraph::degree(g.overreporting))$alpha
+# We then create a power law network
+g.power_law <- igraph::sample_fitness_pl(
+    no.of.nodes = length(igraph::V(g.overreporting)), 
+    no.of.edges = length(igraph::E(g.overreporting)), 
+    exponent.out = alpha, 
+    finite.size.correction = TRUE)
+# We then simulate percolation on this network using the above algorithm
+S <- numeric(120) # vector to hold our results
+sim_size <- 1000 # Number of simulations
+i <- numeric(sim_size) # Vector to hold cluster sizes
+for (n in 0:119) {
+    # n is the number of nodes to remove
+    for (m in 1:sim_size) {
+        # m is the mth simulation
+        to_remove <- sample(1:119, n)
+        # randomly pick n of the 119 nodes to remove
+        i[m] <- igraph::components(
+            igraph::delete_vertices(g.power_law, to_remove))$csize[1]/119
+        # calculate the size of the giant component and save the result to
+        # the variable i
+    }
+    S[n + 1] <- mean(i)
+    # the average cluster size (after removing n nodes) is the average of the
+    # i variable
+}
 
-legend("topleft", legend = c("Simulation", "Poisson"), col = c("black", "red"), lty = c(1, 1))
+# Let's plot
+lines(y = rev(S), x = (0:119)/119, col = "blue")
+
+# Add a legend
+legend("bottomleft", 
+       legend = c("Simulation", "Poisson", "Power Law"), 
+       col = c("black", "red", "blue"), 
+       lty = c(1, 1, 1))
 ```
 
 # Discussion (overreporting model)
@@ -226,3 +300,80 @@ cover all the nodes in the graph.  The size of the giant component also appears
 to breakdown much faster than in the underreporting model.  When about a quarter
 of the nodes are removed from the network, the largest component only connects
 half of the households.
+
+# Desire-to-link model
+We repeat the analysis for the desire to link model.
+
+```{r desire to link percolation, fig.width=6, fig.height=4}
+edgelist <- as.matrix(nyakatoke[nyakatoke$willingness_link1 == 1, 1:2])
+g.desire_to_link <- igraph::graph_from_data_frame(edgelist)
+S <- numeric(120) # vector to hold our results
+sim_size <- 1000 # Number of simulations
+i <- numeric(sim_size) # Vector to hold cluster sizes
+for (n in 0:119) {
+    # n is the number of nodes to remove
+    for (m in 1:sim_size) {
+        # m is the mth simulation
+        to_remove <- sample(1:119, n)
+        # randomly pick n of the 119 nodes to remove
+        i[m] <- max(igraph::components(
+            igraph::delete_vertices(g.desire_to_link, to_remove), mode = "strong")$csize)/119
+        # calculate the size of the giant component and save the result to
+        # the variable i
+    }
+    S[n + 1] <- mean(i)
+    # the average cluster size (after removing n nodes) is the average of the 
+    # i variable
+}
+my_df <- data.frame(phi = 1 - (0:119)/119, S = S)
+# rbind(my_df, c(phi = 0, S = 1), c(phi = 1, S = 0))
+main = expression(paste("Occupaion Probability, ", phi, ", vs. size of giant cluster ", S))
+plot(my_df[1:120,], 
+     type = "l", 
+     main = main,
+     sub = "Desire-to-link Model",
+     xlab = expression(phi),
+     xlim = c(1,0))
+lambda <- mean(igraph::degree(g.desire_to_link, mode = "in"))
+plot(function(phi) phi + gsl::lambert_W0(-lambda * phi * exp(-lambda*phi))/lambda, 
+     from = 0, to = 1, add = TRUE, col = "red")
+
+# Now the power law results.  We first obtain the MLE estimates of the power
+# law exponent
+alpha_1 <- igraph::fit_power_law(igraph::degree(g.desire_to_link, mode = "in"))$alpha
+alpha_2 <- igraph::fit_power_law(igraph::degree(g.desire_to_link, mode = "out"))$alpha
+# We then create a power law network
+g.power_law <- igraph::sample_fitness_pl(
+    no.of.nodes = length(igraph::V(g.desire_to_link)), 
+    no.of.edges = length(igraph::E(g.desire_to_link)), 
+    exponent.in = alpha_1, exponent.out = alpha_2, 
+    finite.size.correction = TRUE)
+# We then simulate percolation on this network using the above algorithm
+S <- numeric(120) # vector to hold our results
+sim_size <- 1000 # Number of simulations
+i <- numeric(sim_size) # Vector to hold cluster sizes
+for (n in 0:119) {
+    # n is the number of nodes to remove
+    for (m in 1:sim_size) {
+        # m is the mth simulation
+        to_remove <- sample(1:119, n)
+        # randomly pick n of the 119 nodes to remove
+        i[m] <- igraph::components(
+            igraph::delete_vertices(g.power_law, to_remove))$csize[1]/119
+        # calculate the size of the giant component and save the result to
+        # the variable i
+    }
+    S[n + 1] <- mean(i)
+    # the average cluster size (after removing n nodes) is the average of the
+    # i variable
+}
+
+# Let's plot
+lines(y = rev(S), x = (0:119)/119, col = "blue")
+
+# Add a legend
+legend("bottomleft", 
+       legend = c("Simulation", "Poisson", "Power Law"), 
+       col = c("black", "red", "blue"), 
+       lty = c(1, 1, 1))
+```
