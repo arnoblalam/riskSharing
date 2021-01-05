@@ -8,12 +8,12 @@
 extreme.r <- function(network, max, stop){
   stopifnot(is.simple(network), is.logical(max), is.numeric(stop)) # Check inputs
   ntw1 <- network
-  r1 <- igraph::assortativity_degree(ntw1) # Calculate initial assortativity coeff.
+  r1 <- assortativity_degree(ntw1) # Calculate initial assortativity coeff.
   ctr <- 1  # Initialize counter
   max_min <- ifelse(max, 1, -1)  # Used in if statement below to "toggle" condition
   while (ctr <= stop){
-    ntw2 <- igraph::rewire(ntw1, with=keeping_degseq(loops=FALSE, niter=1)) # One trial
-    r2 <- igraph::assortativity_degree(ntw2) # Calculate new assortativity coeff.
+    ntw2 <- rewire(ntw1, with=keeping_degseq(loops=FALSE, niter=1)) # One trial
+    r2 <- assortativity_degree(ntw2) # Calculate new assortativity coeff.
     if (r2*max_min > r1*max_min){   # If new value is an improvement ...
       r1 <- r2   # ... update values ...
       ntw1 <- ntw2
@@ -28,14 +28,14 @@ extreme.r <- function(network, max, stop){
 # Find min. or max. clustering coefficient given an assortativity interval
 extreme.c <- function(network, max, lower, upper, stop){
   ntw1 <- network
-  r1 <- igraph::assortativity_degree(ntw1) # Calculate initial assortativity coeff.
-  c1 <- igraph::transitivity(ntw1, type="global", isolates="zero") # Calculate initial clustering coeff.
+  r1 <- assortativity_degree(ntw1) # Calculate initial assortativity coeff.
+  c1 <- transitivity(ntw1, type="global", isolates="zero") # Calculate initial clustering coeff.
   ctr <- 1
   max_min <- ifelse(max, 1, -1)  # Used in if statement below to "toggle" condition
   while(ctr <= stop){
-    ntw2 <- igraph::rewire(ntw1, with=keeping_degseq(loops=FALSE, niter=1)) # One trial
-    r2 <- igraph::assortativity_degree(ntw2) # Calculate new assortativity coeff.
-    c2 <- igraph::transitivity(ntw2, type="global", isolates="zero") # Calculate new clustering coeff.
+    ntw2 <- rewire(ntw1, with=keeping_degseq(loops=FALSE, niter=1)) # One trial
+    r2 <- assortativity_degree(ntw2) # Calculate new assortativity coeff.
+    c2 <- transitivity(ntw2, type="global", isolates="zero") # Calculate new clustering coeff.
     cond1 <- (r2 < lower && r2 > r1)  # Conditions for if statements
     cond2 <- (r2 >= upper && r2 < r1)
     cond3 <- (lower <= r2 && r2 < upper)
@@ -65,24 +65,6 @@ repeat.c <- function(network, max, lower, upper, stop, reps){
   results <- sapply(1:reps, function(x) extreme.c(network, max, lower, upper, stop))
   overall.c <- ifelse(max, max(results), min(results)) 
   return(overall.c)
-}
-
-# Randomly "walk" in a given pixel for more uniform sampling
-walk <- function(network, r.lower, r.upper, c.lower, c.upper, stop){
-  ntw1 <- network
-  ctr <- 1
-  while (ctr <= stop){
-    ntw2 <- igraph::rewire(ntw1, with=keeping_degseq(loops=FALSE, niter=1)) # One trial
-    r2 <- igraph::assortativity_degree(ntw2) # Calculate new assortativity coeff.
-    c2 <- igraph::transitivity(ntw2, type="global", isolates="zero") # Calculate new clustering coeff.
-    cond1 <- (r2 >= r.lower && r2 < r.upper)
-    cond2 <- (c2 >= c.lower && c2 < c.upper)
-    if (cond1 && cond2){ # If inside interval ...
-      ntw1 <- ntw2   # ... then update
-      ctr <- ctr + 1
-    }
-  }
-  return(ntw2)
 }
 
 # Generate data frame w/ valid pixels only
@@ -118,21 +100,18 @@ valid.pixels <- function(min.r, max.r, vmin.c, vmax.c, L){
 sampling <- function(samp, name, network, pixels, min.r, max.r, min.c, max.c, stop){
   #stopifnot(is.character(name), is.simple(network), dim(pixels)[2]==4,
   #          is.numeric(c(samp, min.r, max.r, min.c, max.c, stop))) # Check inputs
-  pixels <- pixels[sample(1:nrow(pixels)),] # Randomize pixel order
-  pixels[, "dist"] <- numeric()  # Add columns to store results
-  pixels[, "component"] <- numeric()
-  pixels[, "random.50"] <- numeric()
-  pixels[, "targeted.50"] <- numeric()
-  pixels[, "targeted.75"] <- numeric()
-  #pixels <- as.matrix(pixels)  
+  pixel.count <- nrow(pixels)
+  pixels <- pixels[sample(1:pixel.count),] # Randomize pixel order
+  pixels <- as.list(pixels)    # Pixels to list
+  results <- vector("list", pixel.count) # List to store results
   ntw1 <- network
-  r1 <- igraph::assortativity_degree(ntw1) # Calculate initial assortativity coeff.
-  c1 <- igraph::transitivity(ntw1, type="global", isolates="zero") # Calculate initial clustering coeff.
-  for (octr in 1:nrow(pixels)){  # Run for each pixel
-    lb.r <- pixels[octr, 1]  # Unpack lower and upper bounds for pixel
-    ub.r <- pixels[octr, 2]
-    lb.c <- pixels[octr, 3]
-    ub.c <- pixels[octr, 4]
+  r1 <- assortativity_degree(ntw1) # Calculate initial assortativity coeff.
+  c1 <- transitivity(ntw1, type="global", isolates="zero") # Calculate initial clustering coeff.
+  for (octr in 1:pixel.count){  # Run for each pixel 
+    lb.r <- pixels[[1]][octr]  # Unpack lower and upper bounds for pixel
+    ub.r <- pixels[[2]][octr] 
+    lb.c <- pixels[[3]][octr] 
+    ub.c <- pixels[[4]][octr] 
     center.r <- (lb.r + ub.r)/2  # Calculate pixel center
     center.c <- (lb.c + ub.c)/2
     rd1 <- ((r1 - center.r)/(max.r - min.r))^2 # Calculate components of distance formula
@@ -142,9 +121,9 @@ sampling <- function(samp, name, network, pixels, min.r, max.r, min.c, max.c, st
     cond2 <- (c1 < lb.c) || (c1 >= ub.c)
     ictr <- 1   # Initialize inner counter
     while ((cond1 || cond2) && ictr <= 1e+05){  # While outside pixel ...
-      ntw2 <- igraph::rewire(ntw1, with=keeping_degseq(loops=FALSE, niter=1)) # One trial
-      r2 <- igraph::assortativity_degree(ntw2) # Calculate new assortativity coeff.
-      c2 <- igraph::transitivity(ntw2, type="global", isolates="zero") # Calculate new clustering coeff.
+      ntw2 <- rewire(ntw1, with=keeping_degseq(loops=FALSE, niter=1)) # One trial
+      r2 <- assortativity_degree(ntw2) # Calculate new assortativity coeff.
+      c2 <- transitivity(ntw2, type="global", isolates="zero") # Calculate new clustering coeff.
       rd2 <- ((r2 - center.r)/(max.r - min.r))^2
       cd2 <- ((c2 - center.c)/(max.c - min.c))^2
       d2 <- sqrt(rd2 + cd2)   # Calculate new distance
@@ -160,37 +139,57 @@ sampling <- function(samp, name, network, pixels, min.r, max.r, min.c, max.c, st
     }  
     if (ictr <= 1e+05){   # If exit was successful ...
       ntw3 <- walk(ntw1, lb.r, ub.r, lb.c, ub.c, stop) # Execute walk
-      dist <- igraph::mean_distance(ntw3)  # Calculate stats
-      component <- max(igraph::components(ntw3)$csize)   
+      dist <- mean_distance(ntw3)  # Calculate stats
+      component <- max(components(ntw3)$csize)   
       random.50 <- f.random(ntw3, 0.50, 1)
       targeted.50 <- f.targeted(ntw3, 0.50)
       targeted.75 <- f.targeted(ntw3, 0.75)
-      pixels[octr, "dist"] <- dist # Store stats
-      pixels[octr, "component"] <- component  
-      pixels[octr, "random.50"] <- random.50
-      pixels[octr, "targeted.50"] <- targeted.50
-      pixels[octr, "targeted.75"] <- targeted.75
-    } 
+      results[[octr]] <- list(dist, component, random.50, targeted.50, targeted.75)
+    } else {results[[octr]] <- rep(list(NA), 5)}
   }
-  write.csv(pixels, file=paste0("./out/", name, samp, ".csv"), row.names=FALSE)
+  pixels <- cbind(as.data.table(pixels), rbindlist(results))
+  names(pixels)[5] <- "dist"
+  names(pixels)[6] <- "component"
+  names(pixels)[7] <- "random.50"
+  names(pixels)[8] <- "targeted.50"
+  names(pixels)[9] <- "targeted.75"
+  fwrite(pixels, file=paste0("./out/", name, samp, ".csv"), row.names=FALSE)
   gc()
   return(NULL)
+}
+
+# Randomly "walk" in a given pixel for more uniform sampling
+walk <- function(network, r.lower, r.upper, c.lower, c.upper, stop){
+  ntw1 <- network
+  ctr <- 1
+  while (ctr <= stop){
+    ntw2 <- rewire(ntw1, with=keeping_degseq(loops=FALSE, niter=1)) # One trial
+    r2 <- assortativity_degree(ntw2) # Calculate new assortativity coeff.
+    c2 <- transitivity(ntw2, type="global", isolates="zero") # Calculate new clustering coeff.
+    cond1 <- (r2 >= r.lower && r2 < r.upper)
+    cond2 <- (c2 >= c.lower && c2 < c.upper)
+    if (cond1 && cond2){ # If inside interval ...
+      ntw1 <- ntw2   # ... then update
+      ctr <- ctr + 1
+    }
+  }
+  return(ntw2)
 }
 
 # Calculate f-robustness of a network where removal is random
 f.random <- function(network, f, reps){
   #stopifnot(is.simple(network), f>0, f<1, is.numeric(reps)) # Check inputs
   ntw1 <- network
-  n <- length(igraph::V(ntw1))
+  n <- length(V(ntw1))
   results <- sapply(1:reps, function(i){
     sapply(1:(n - 2), function(j){
       to.remove <- sample(1:n, j)
-      ntw2 <- igraph::delete_vertices(ntw1, to.remove) 
-      max(igraph::components(ntw2)$csize) # Store comp. size  
+      ntw2 <- delete_vertices(ntw1, to.remove) 
+      max(components(ntw2)$csize) # Store comp. size  
     })
   })
   results <- rowMeans(results) # Average across repetitions
-  results <- results/max(igraph::components(ntw1)$csize) # Relative comp. size
+  results <- results/max(components(ntw1)$csize) # Relative comp. size
   result <- min(which(results < f), 119)/n  # Fraction to delete
   return(result)
 }  
@@ -199,17 +198,17 @@ f.random <- function(network, f, reps){
 f.targeted <- function(network, f){
   #stopifnot(is.simple(network), f>0, f<1) # Check inputs
   ntw1 <- network
-  n <- length(igraph::V(ntw1))
+  n <- length(V(ntw1))
   mat <- matrix(ncol=2, nrow=n, 0)  # Create matrix w/ node degrees
   mat[, 1] <- 1:n
-  deg <- igraph::degree(ntw1)
+  deg <- degree(ntw1)
   mat[, 2] <- deg
   mat <- mat[order(mat[, 2], decreasing=TRUE), ]  # Order matrix by degree
   results <- sapply(1:(n - 2), function(i){
-    ntw2 <- igraph::delete_vertices(ntw1, mat[1:i, 1])
-    max(igraph::components(ntw2)$csize)
+    ntw2 <- delete_vertices(ntw1, mat[1:i, 1])
+    max(components(ntw2)$csize)
   })
-  results <- results/max(igraph::components(ntw1)$csize) # Relative comp. size
+  results <- results/max(components(ntw1)$csize) # Relative comp. size
   result <- min(which(results < f), 119)/n  # Fraction to delete
   return(result)
 }

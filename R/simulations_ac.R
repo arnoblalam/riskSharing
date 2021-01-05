@@ -1,15 +1,17 @@
-#### Assortativity and clustering simulations for "The structure of risk-sharing
-#### networks" by H. Henderson and A. Alam.
+#### Project title: The structure of risk-sharing networks
+#### Authors: H. Henderson and A. Alam
+#### Last updated: 1/1/2021
+#### Purpose: Creates results for Section 4.2 of the paper
 #### Note: The algorithm used in these simulations is discussed in detail in
 #### Holme and Zhao's (2007) "Exploring the assortavity-clustering space of
 #### a network's degree sequence."
 
 # Set up and read in data
 # Note: igraph must be installed
-setwd("/home/aa2288a")
+setwd("/home/hh9467a")
 library("parallel")
 library("igraph") 
-library("data.table", lib.loc="/home/aa2288a/R-packages/")
+library("data.table", lib.loc="/home/hh9467a/R-packages/")
 source("sim_functions_ac.R")
 nyakatoke <- read.csv("Nyakatoke.csv")
 
@@ -18,15 +20,15 @@ underreporting.df <-
   nyakatoke[nyakatoke$willingness_link1 == 1 | nyakatoke$willingness_link2 == 1,]
 
 # Read underreporting network into igraph and remove redundant links
-g.underreporting <- graph_from_data_frame(underreporting.df, directed = FALSE)
-g.underreporting <- simplify(g.underreporting)
+g.underreporting <- igraph::graph_from_data_frame(underreporting.df, directed = FALSE)
+g.underreporting <- igraph::simplify(g.underreporting)
 
 # Overreporting network
 overreporting.df <- 
   nyakatoke[nyakatoke$willingness_link1 == 1 & nyakatoke$willingness_link2 == 1,]
 
 # Read overreporting network into igraph
-g.overreporting <- graph_from_data_frame(overreporting.df, directed = FALSE)
+g.overreporting <- igraph::graph_from_data_frame(overreporting.df, directed = FALSE)
 
 # From examining the list of vertices, we find that households 7, 30 32, 36, 44,
 # 65, 84, 88, 91, 96, 107, 110, 116, 117, 118 and 119 don't show up in the 
@@ -41,7 +43,7 @@ g.overreporting <- (Reduce(f = function(x, y) {y + igraph::vertex(x)},
                            right = TRUE))
 
 # Remove multiple edges from overreporting network
-g.overreporting <- simplify(g.overreporting)
+g.overreporting <- igraph::simplify(g.overreporting)
 
 # Specify network to use
 network <- g.underreporting  # Underreporting or overreporting 
@@ -60,11 +62,11 @@ rm(g.overreporting, g.underreporting, missing.vertices, nyakatoke,
 
 # Parameters
 # Note: Holme and Zhao parameter values are in parentheses
-vsame <- 1e+02  # No. of times r and c don't change before stopping (10^5)
-vrep <- 2   # No. of times extreme methods are called (5)
-vsamp <- 2  # No. of times each pixel is sampled (100)
-vrnd <- 10  # No. of discarded networks in walk method (1000)
-L <- 5     # No. of partitions on both assortativity and clustering space (50) 
+vsame <- 1e+05  # No. of times r and c don't change before stopping (10^5)
+vrep <- 5   # No. of times extreme methods are called (5)
+vsamp <- 100  # No. of times each pixel is sampled (100)
+vrnd <- 1000  # No. of discarded networks in walk method (1000)
+L <- 25     # No. of partitions on both assortativity and clustering space (50) 
 no.cores <- 20  # No. of cores to use
 
 # Set seed
@@ -99,7 +101,7 @@ print(vmax.c)
 
 # Get valid pixels
 pixels <- valid.pixels(min.r=min.r, max.r=max.r, vmin.c=vmin.c, vmax.c=vmax.c, L=L)
-write.csv(pixels[[1]], file=paste0("./out/", "all_", name, ".csv"), row.names=FALSE)
+fwrite(pixels[[1]], file=paste0("./out/", "all_", name, ".csv"), row.names=FALSE)
 pixels <- pixels[[2]] # Valid pixels
 
 # Remove select objects
@@ -117,3 +119,5 @@ for (i in seq){   # Explicitly enumerate iterations
   results <- mclapply(start:end, function(samp) sampling(samp, name, network, 
                 pixels, min.r, max.r, min.c, max.c, vrnd), mc.cores = no.cores)
 }
+
+
